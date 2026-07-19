@@ -27,21 +27,21 @@ Loom uses a **Hybrid Container Architecture** built directly on top of the nativ
 
 ```mermaid
 graph TD
-    subgraph Loom Container (.loom / .flac)
-        magic[fLaC Magic Header] --> streaminfo[STREAMINFO Block - Master Mix Metadata]
-        streaminfo --> vorbis[VORBIS_COMMENT Block - Tags / Project Info]
-        vorbis --> picture[PICTURE Block - Album Cover / Thumbnail]
-        picture --> loom_app[LOOM APPLICATION Blocks]
+    subgraph "Loom Container (.loom / .flac)"
+        magic["fLaC Magic Header"] --> streaminfo["STREAMINFO Block - Master Mix Metadata"]
+        streaminfo --> vorbis["VORBIS_COMMENT Block - Tags / Project Info"]
+        vorbis --> picture["PICTURE Block - Album Cover / Thumbnail"]
+        picture --> loom_app["LOOM APPLICATION Blocks"]
         
-        subgraph LOOM APPLICATION Payload
-            session_h[Session Header - Tracks Metadata]
-            seek_t[Seek Table - O(1) Track Pointers]
-            edit_b[Edit Block - Non-destructive fades, mutes, gain envelopes]
-            loom_frames[Loom Multi-track Frames - Tracks 1..N]
+        subgraph "LOOM APPLICATION Payload"
+            session_h["Session Header - Tracks Metadata"]
+            seek_t["Seek Table - O(1) Track Pointers"]
+            edit_b["Edit Block - Non-destructive fades, mutes, gain envelopes"]
+            loom_frames["Loom Multi-track Frames - Tracks 1..N"]
         end
         
-        loom_app --> padding[PADDING Block - 4KB aligned]
-        padding --> flac_frames[Native FLAC Frame Stream - Track 0 Master Mix]
+        loom_app --> padding["PADDING Block - 4KB aligned"]
+        padding --> flac_frames["Native FLAC Frame Stream - Track 0 Master Mix"]
     end
     
     classDef highlight fill:#4f46e5,stroke:#312e81,color:#ffffff
@@ -137,9 +137,9 @@ cargo run --release --bin loom -- apply-diff session_v1.loom session.diff recons
 
 ## Project Structure
 
-* [loom-core](file:///c:/Users/sahil/Downloads/loom/loom-core/): Main library containing prediction engines (LPC/Fixed), entropy coding (Golomb-Rice), container serialization, edit overlays, and diffing algorithms.
-* [loom-cli](file:///c:/Users/sahil/Downloads/loom/loom-cli/): Command-line application exposing the codec tools.
-* [research](file:///c:/Users/sahil/Downloads/loom/research/): Comprehensive design notes and papers outlining the algorithms, container constraints, and decorrelation formulas.
+* [loom-core](https://github.com/aikyaam/loom/loom-core/): Main library containing prediction engines (LPC/Fixed), entropy coding (Golomb-Rice), container serialization, edit overlays, and diffing algorithms.
+* [loom-cli](https://github.com/aikyaam/loom/loom-cli/): Command-line application exposing the codec tools.
+* [research](https://github.com/aikyaam/loom/research/): Comprehensive design notes and papers outlining the algorithms, container constraints, and decorrelation formulas.
 
 ---
 
@@ -149,4 +149,3 @@ Run the integration and round-trip tests to verify system integrity:
 ```bash
 cargo test -p loom-core --test roundtrip
 ```
-*(Note: On Windows, background indexers may lock build files. If you hit `os error 32`, run `cargo clean` and retry.)*
