@@ -1,0 +1,21 @@
+[package]
+name = "loom-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Loom codec library — encode, decode, edit, diff"
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+byteorder = "1.5"
+md-5 = "0.10"
+thiserror = "1.0"
+log = "0.4"
+rayon = "1.8"
+
+[dev-dependencies]
+# For generating test audio
+hound = "3.5"

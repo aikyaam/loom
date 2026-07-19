@@ -1,0 +1,20 @@
+[package]
+name = "loom-bench"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Loom benchmark harness"
+
+[[bench]]
+name = "codec_bench"
+harness = false
+
+[dependencies]
+loom-core = { path = "../loom-core" }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+hound = "3.5"
+flacenc = "0.5"
+claxon = "0.4"
