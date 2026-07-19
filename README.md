@@ -81,9 +81,17 @@ Where $W_q$ is an 8-bit quantized coupling weight computed dynamically on each f
 
 ---
 
+## Pre-compiled Releases
+
+If you want to run the Loom CLI directly without having to compile it from source, you can download the pre-compiled executables for **Windows**, **macOS**, and **Linux** from the [GitHub Releases](https://github.com/aikyaam/loom/releases) page.
+
+Our automated release pipeline compiles the CLI binary in release mode for all three major target systems whenever a new version tag (e.g., `v*`) is pushed.
+
+---
+
 ## Usage Guide
 
-Ensure you have [Rust](https://www.rust-lang.org/) installed, then interact with Loom via the CLI:
+Ensure you have [Rust](https://www.rust-lang.org/) installed (unless using the pre-compiled release executables), then interact with Loom via the CLI:
 
 ### 1. Encoding Stems and Sessions
 To compress a single track into a playable `.loom` file:
