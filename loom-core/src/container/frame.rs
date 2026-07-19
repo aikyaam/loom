@@ -83,7 +83,7 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn serialize_loom(&self, track_idx: u16, bps: usize) -> Vec<u8> {
+    pub fn serialize_loom(&self, track_idx: u16, bps: usize, allow_escape: bool) -> Vec<u8> {
         let mut writer = BitWriter::new();
 
         writer.write_bits(0xF8A5, 16);
@@ -148,7 +148,7 @@ impl Frame {
                     for i in 0..*order {
                         writer.write_bits((residuals[i] as u64) & mask, subframe_bps);
                     }
-                    encode_residuals(&mut writer, residuals, *order, 2);
+                    encode_residuals(&mut writer, residuals, *order, 2, allow_escape);
                 }
                 PredictionMode::Lpc {
                     order,
@@ -172,7 +172,7 @@ impl Frame {
                         writer.write_bits((residuals[i] as u64) & mask_bps, subframe_bps);
                     }
 
-                    encode_residuals(&mut writer, residuals, *order, 2);
+                    encode_residuals(&mut writer, residuals, *order, 2, allow_escape);
                 }
             }
         }
@@ -184,7 +184,7 @@ impl Frame {
         bytes
     }
 
-    pub fn serialize_flac(&self, sample_number: u64, bps: usize) -> Vec<u8> {
+    pub fn serialize_flac(&self, sample_number: u64, bps: usize, allow_escape: bool) -> Vec<u8> {
         let mut writer = BitWriter::new();
 
         writer.write_bits(0x3FFE, 14);
@@ -257,7 +257,7 @@ impl Frame {
                     for i in 0..*order {
                         writer.write_bits((residuals[i] as u64) & mask, subframe_bps);
                     }
-                    encode_residuals(&mut writer, residuals, *order, 2);
+                    encode_residuals(&mut writer, residuals, *order, 2, allow_escape);
                 }
                 PredictionMode::Lpc {
                     order,
@@ -281,7 +281,7 @@ impl Frame {
                         writer.write_bits((coeff as u64) & mask_prec, *qlp_precision);
                     }
 
-                    encode_residuals(&mut writer, residuals, *order, 2);
+                    encode_residuals(&mut writer, residuals, *order, 2, allow_escape);
                 }
             }
         }

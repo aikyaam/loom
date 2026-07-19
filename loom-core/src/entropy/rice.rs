@@ -34,6 +34,10 @@ pub fn min_bits_2s_complement(val: i64) -> usize {
     }
 }
 
+pub fn find_best_k_exhaustive(folded_samples: &[u64], slice: &[i64]) -> (u32, u64, usize) {
+    find_best_k(folded_samples, slice)
+}
+
 pub fn find_best_k(folded_samples: &[u64], slice: &[i64]) -> (u32, u64, usize) {
     if folded_samples.is_empty() {
         return (0, 0, 0);
@@ -80,6 +84,7 @@ pub fn encode_residuals(
     residuals: &[i64],
     warmup_len: usize,
     partition_order: u32,
+    allow_escape: bool,
 ) {
     let num_partitions = 1 << partition_order;
     let total_len = residuals.len();
@@ -109,7 +114,24 @@ pub fn encode_residuals(
 
         let slice = &residuals[p_start..end];
         let folded: Vec<u64> = slice.iter().map(|&x| fold(x)).collect();
-        let (k, _, escape_bps) = find_best_k(&folded, slice);
+
+        let (k, _, escape_bps) = if allow_escape {
+            find_best_k(&folded, slice)
+        } else {
+            let mut best_k = 0;
+            let mut min_bits = u64::MAX;
+            for k in 0..15 {
+                let mut bits = 0u64;
+                for &val in &folded {
+                    bits += rice_bits(val, k);
+                }
+                if bits < min_bits {
+                    min_bits = bits;
+                    best_k = k;
+                }
+            }
+            (best_k as u32, min_bits, 0)
+        };
 
         writer.write_bits(k as u64, 4);
 
@@ -142,11 +164,20 @@ pub fn decode_residuals(
     let total_len = residuals.len();
 
     let coding_method = reader.read_bits(2)?;
-    if coding_method != 0 {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            format!("Unsupported residual coding method: {}", coding_method),
-        ));
+    match coding_method {
+        0 => {}
+        2 => {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "ANS residual coding method (10b) is reserved and not yet implemented",
+            ));
+        }
+        _ => {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("Unsupported residual coding method: {}", coding_method),
+            ));
+        }
     }
 
     let partition_order = reader.read_bits(4)? as u32;

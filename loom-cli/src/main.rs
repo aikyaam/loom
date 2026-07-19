@@ -1,9 +1,10 @@
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
 use hound::{WavReader, WavSpec, WavWriter};
+use loom_core::config::EncoderConfig;
 use loom_core::container::header::SessionHeader;
 use loom_core::verify::{compute_pcm_md5, verify_stream};
-use loom_core::{decode_session, decode_track, encode_session, encode_track};
+use loom_core::{decode_session, decode_track, encode_session_with_config, encode_track};
 use std::fs::{self, File};
 use std::io::{Cursor, Read, Write};
 use std::path::Path;
@@ -26,6 +27,8 @@ enum Commands {
         block_size: u32,
         #[arg(long)]
         thumbnail: Option<String>,
+        #[arg(long, default_value_t = 5)]
+        compression_level: u8,
     },
     Decode {
         input: String,
@@ -39,6 +42,8 @@ enum Commands {
         output: String,
         #[arg(long, default_value_t = 4096)]
         block_size: u32,
+        #[arg(long, default_value_t = 5)]
+        compression_level: u8,
     },
     DecodeSession {
         input: String,
@@ -102,6 +107,7 @@ fn main() -> Result<()> {
             output,
             block_size,
             thumbnail,
+            compression_level,
         } => {
             println!("Encoding {} to {}...", input, output);
             let input_path = Path::new(&input);
@@ -138,12 +144,16 @@ fn main() -> Result<()> {
                 });
             }
 
-            let compressed = loom_core::encode_session(
-                &[channels],
-                &[track_name.to_string()],
+            let config = EncoderConfig::new(
+                compression_level,
+                block_size as usize,
                 sample_rate,
                 bit_depth,
-                block_size as usize,
+            );
+            let compressed = encode_session_with_config(
+                &[channels],
+                &[track_name.to_string()],
+                &config,
                 None,
                 None,
                 picture_block.as_ref(),
@@ -243,6 +253,7 @@ fn main() -> Result<()> {
             input_dir,
             output,
             block_size,
+            compression_level,
         } => {
             println!("Scanning stems in {}...", input_dir);
             let mut wav_paths = Vec::new();
@@ -334,17 +345,15 @@ fn main() -> Result<()> {
                 block_size
             );
 
-            let compressed = encode_session(
-                &tracks,
-                &track_names,
+            let config = EncoderConfig::new(
+                compression_level,
+                block_size as usize,
                 spec.sample_rate,
                 spec.bits_per_sample as u8,
-                block_size as usize,
-                None,
-                None,
-                None,
-            )
-            .map_err(|e| anyhow!("Session compression failed: {}", e))?;
+            );
+            let compressed =
+                encode_session_with_config(&tracks, &track_names, &config, None, None, None)
+                    .map_err(|e| anyhow!("Session compression failed: {}", e))?;
 
             let mut out_file = File::create(&output)?;
             out_file.write_all(&compressed)?;

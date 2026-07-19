@@ -1,4 +1,5 @@
 use crate::bitstream::BitReader;
+use crate::config::{EncoderConfig, StereoSearch};
 use crate::container::edit_block::EditBlock;
 use crate::container::frame::{Frame, Subframe};
 use crate::container::header::{SessionHeader, TrackInfo};
@@ -24,6 +25,18 @@ pub fn encode_session(
     tags: Option<&MetadataTags>,
     picture: Option<&PictureBlock>,
 ) -> io::Result<Vec<u8>> {
+    let config = EncoderConfig::new(5, block_size, sample_rate, bit_depth);
+    encode_session_with_config(tracks, track_names, &config, edits, tags, picture)
+}
+
+pub fn encode_session_with_config(
+    tracks: &[Vec<Vec<i64>>],
+    track_names: &[String],
+    config: &EncoderConfig,
+    edits: Option<&crate::container::edit_block::EditBlock>,
+    tags: Option<&MetadataTags>,
+    picture: Option<&PictureBlock>,
+) -> io::Result<Vec<u8>> {
     if tracks.is_empty() || tracks[0].is_empty() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
@@ -33,7 +46,9 @@ pub fn encode_session(
 
     let num_tracks = tracks.len();
     let total_samples = tracks[0][0].len();
-    let bps = bit_depth as usize;
+    let bps = config.bit_depth as usize;
+    let block_size = config.block_size;
+    let level = config.compression_level;
 
     let mut track_infos = Vec::with_capacity(num_tracks);
     for t in 0..num_tracks {
@@ -44,7 +59,7 @@ pub fn encode_session(
                 interleaved.push(tracks[t][ch][s]);
             }
         }
-        let md5 = compute_pcm_md5(&interleaved, bit_depth);
+        let md5 = compute_pcm_md5(&interleaved, config.bit_depth);
         track_infos.push(TrackInfo {
             name: track_names[t].clone(),
             total_samples: total_samples as u64,
@@ -53,8 +68,8 @@ pub fn encode_session(
     }
 
     let header = SessionHeader {
-        sample_rate,
-        bit_depth,
+        sample_rate: config.sample_rate,
+        bit_depth: config.bit_depth,
         tracks: track_infos,
     };
 
@@ -67,33 +82,34 @@ pub fn encode_session(
     let mut frame_seq = 0u32;
 
     let mut min_block_size = u16::MAX;
-    let mut max_block_size = 0u16;
+    let mut max_block_size = u16::MIN;
     let mut min_frame_size = u32::MAX;
-    let mut max_frame_size = 0u32;
+    let mut max_frame_size = u32::MIN;
 
     while offset < total_samples {
-        let mut current_block_size = std::cmp::min(block_size as usize, total_samples - offset);
+        let mut current_block_size = std::cmp::min(block_size, total_samples - offset);
 
-        let mut earliest_transient = None;
-        for t in 0..num_tracks {
-            let track_ch_count = tracks[t].len();
-            for ch in 0..track_ch_count {
-                if let Some(transient_idx) = crate::analyze::detect_transient(
-                    &tracks[t][ch][offset..(offset + current_block_size)],
-                ) {
-                    let split_at = std::cmp::max(128, transient_idx.saturating_sub(64));
-                    if let Some(earliest) = earliest_transient {
-                        earliest_transient = Some(std::cmp::min(earliest, split_at));
-                    } else {
-                        earliest_transient = Some(split_at);
+        if level.variable_block_size() {
+            let mut earliest_transient = None;
+            for t in 0..num_tracks {
+                let track_ch_count = tracks[t].len();
+                for ch in 0..track_ch_count {
+                    if let Some(transient_idx) = crate::analyze::detect_transient(
+                        &tracks[t][ch][offset..(offset + current_block_size)],
+                    ) {
+                        let split_at = std::cmp::max(128, transient_idx.saturating_sub(64));
+                        if let Some(earliest) = earliest_transient {
+                            earliest_transient = Some(std::cmp::min(earliest, split_at));
+                        } else {
+                            earliest_transient = Some(split_at);
+                        }
                     }
                 }
             }
-        }
-
-        if let Some(split) = earliest_transient {
-            if split < current_block_size {
-                current_block_size = split;
+            if let Some(split) = earliest_transient {
+                if split < current_block_size {
+                    current_block_size = split;
+                }
             }
         }
 
@@ -117,7 +133,14 @@ pub fn encode_session(
             let mut subframes = Vec::new();
             let mut stereo_mode = StereoMode::Independent;
             if track_ch_count == 2 {
-                let (sm, ch0, ch1) = search_stereo_mode(&block_channels[0], &block_channels[1]);
+                let (sm, ch0, ch1) = match level.stereo_search() {
+                    StereoSearch::Off => (
+                        StereoMode::Independent,
+                        block_channels[0].clone(),
+                        block_channels[1].clone(),
+                    ),
+                    _ => search_stereo_mode(&block_channels[0], &block_channels[1]),
+                };
                 stereo_mode = sm;
 
                 let w0 = compute_wasted_bits(&ch0);
@@ -126,7 +149,7 @@ pub fn encode_session(
                 } else {
                     ch0.clone()
                 };
-                let mut mode0 = search_predictor(&shifted0, bps - w0 as usize);
+                let mut mode0 = search_predictor(&shifted0, bps - w0 as usize, level);
 
                 let mut ref_track = None;
                 let mut ref_weight = 0i8;
@@ -169,7 +192,7 @@ pub fn encode_session(
                 } else {
                     ch1.clone()
                 };
-                let mode1 = search_predictor(&shifted1, side_bps - w1 as usize);
+                let mode1 = search_predictor(&shifted1, side_bps - w1 as usize, level);
                 subframes.push(Subframe {
                     mode: mode1,
                     ref_track: None,
@@ -185,7 +208,7 @@ pub fn encode_session(
                     } else {
                         ch_data.clone()
                     };
-                    let mut mode = search_predictor(&shifted, bps - w as usize);
+                    let mut mode = search_predictor(&shifted, bps - w as usize, level);
 
                     let mut ref_track = None;
                     let mut ref_weight = 0i8;
@@ -252,6 +275,7 @@ pub fn encode_session(
                 subframes,
             };
 
+            let allow_escape = level.escape_coding();
             if t == 0 {
                 let frame_offset = track0_frames_buf.len() as u64;
                 seek_table.tracks_points[0].push(SeekPoint {
@@ -259,8 +283,7 @@ pub fn encode_session(
                     byte_offset: frame_offset,
                     frame_samples: current_block_size as u32,
                 });
-
-                let frame_bytes = frame.serialize_flac(current_samples[0], bps);
+                let frame_bytes = frame.serialize_flac(current_samples[0], bps, allow_escape);
                 let fsize = frame_bytes.len() as u32;
                 if fsize < min_frame_size {
                     min_frame_size = fsize;
@@ -276,8 +299,7 @@ pub fn encode_session(
                     byte_offset: frame_offset,
                     frame_samples: current_block_size as u32,
                 });
-
-                let frame_bytes = frame.serialize_loom(t as u16, bps);
+                let frame_bytes = frame.serialize_loom(t as u16, bps, allow_escape);
                 loom_frames_buf.extend_from_slice(&(frame_bytes.len() as u32).to_be_bytes());
                 loom_frames_buf.extend_from_slice(&frame_bytes);
             }
@@ -298,9 +320,9 @@ pub fn encode_session(
         max_block_size,
         min_frame_size,
         max_frame_size,
-        sample_rate,
+        sample_rate: config.sample_rate,
         channels: tracks[0].len() as u8,
-        bit_depth,
+        bit_depth: config.bit_depth,
         total_samples: header.tracks[0].total_samples,
         md5: header.tracks[0].md5,
     };
@@ -444,10 +466,7 @@ pub fn decode_session_full(
     let bps = header.bit_depth as usize;
 
     let _seek_table = SeekTable::deserialize(&mut loom_cursor)?;
-    let edit_block = match EditBlock::deserialize(&mut loom_cursor) {
-        Ok(eb) => Some(eb),
-        Err(_) => None,
-    };
+    let edit_block = EditBlock::deserialize(&mut loom_cursor).ok();
 
     let loom_frames_payload = &loom_payload[loom_cursor.position() as usize..];
 
