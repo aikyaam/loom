@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use flacenc::component::BitRepr;
 use flacenc::error::Verify;
-use loom_core::{decode_track, EncoderConfig, encode_track_with_config};
+use loom_core::{decode_track, encode_track_with_config, EncoderConfig};
 
 fn generate_sine_sweep(length: usize, sample_rate: u32) -> Vec<i64> {
     let mut data = Vec::with_capacity(length);
@@ -138,7 +138,13 @@ fn bench_compression_ratio(c: &mut Criterion) {
         for level in [0, 5, 8] {
             let compressed = encode_loom(&channels, level, sample_rate, name);
             let ratio = compressed.len() as f64 / raw_size as f64;
-            println!("  {:<12} level {}: {:>8} bytes ({:.1}%)", name, level, compressed.len(), ratio * 100.0);
+            println!(
+                "  {:<12} level {}: {:>8} bytes ({:.1}%)",
+                name,
+                level,
+                compressed.len(),
+                ratio * 100.0
+            );
         }
     }
 
@@ -147,7 +153,12 @@ fn bench_compression_ratio(c: &mut Criterion) {
         let samples_i32: Vec<i32> = signal.iter().map(|&x| x as i32).collect();
         let compressed = encode_flac(&samples_i32, sample_rate, 4096);
         let ratio = compressed.len() as f64 / raw_size as f64;
-        println!("  {:<12} flac    : {:>8} bytes ({:.1}%)", name, compressed.len(), ratio * 100.0);
+        println!(
+            "  {:<12} flac    : {:>8} bytes ({:.1}%)",
+            name,
+            compressed.len(),
+            ratio * 100.0
+        );
     }
     println!();
 }
