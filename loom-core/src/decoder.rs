@@ -2,7 +2,8 @@ use crate::container::header::SessionHeader;
 use std::io;
 
 pub fn decode_track(session_bytes: &[u8]) -> io::Result<(Vec<Vec<i64>>, SessionHeader)> {
-    let (mut tracks, header, _, _, _) = crate::container::session::decode_session_full(session_bytes)?;
+    let (mut tracks, header, _, _, _) =
+        crate::container::session::decode_session_full(session_bytes)?;
     if tracks.is_empty() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,

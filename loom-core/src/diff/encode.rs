@@ -1,11 +1,13 @@
+use crate::container::edit_block::EditBlock;
 use crate::container::header::SessionHeader;
 use crate::container::seek_index::SeekTable;
-use crate::container::edit_block::EditBlock;
 use crate::diff::container::{FrameInstruction, SessionDiff, TrackDiff};
 use md5::{Digest, Md5};
 use std::io::{self, Cursor, Read};
 
-fn extract_loom_payload_and_track0(session_bytes: &[u8]) -> io::Result<(Vec<u8>, SessionHeader, Vec<u8>)> {
+fn extract_loom_payload_and_track0(
+    session_bytes: &[u8],
+) -> io::Result<(Vec<u8>, SessionHeader, Vec<u8>)> {
     let mut cursor = Cursor::new(session_bytes);
     let mut magic = [0u8; 4];
     cursor.read_exact(&mut magic)?;
@@ -77,8 +79,12 @@ pub fn extract_raw_frames(session_bytes: &[u8]) -> io::Result<Vec<Vec<Vec<u8>>>>
 
     for t in 0..num_tracks {
         let points = &seek_table.tracks_points[t];
-        let payload = if t == 0 { &track0_payload } else { loom_frames_payload };
-        
+        let payload = if t == 0 {
+            &track0_payload
+        } else {
+            loom_frames_payload
+        };
+
         for i in 0..points.len() {
             let start = points[i].byte_offset as usize;
             let end = if i + 1 < points.len() {
@@ -107,7 +113,7 @@ pub fn encode_diff(v1_bytes: &[u8], v2_bytes: &[u8]) -> io::Result<SessionDiff> 
     let _header = SessionHeader::deserialize(&mut loom_cursor)?;
     let _seek_table = SeekTable::deserialize(&mut loom_cursor)?;
     let _edit_block = EditBlock::deserialize(&mut loom_cursor)?;
-    
+
     // For GHA/tests, the diff structure expects the metadata payload.
     // Wait, the diff metadata payload in GHA applies to reconstruct the target v2 file.
     // In GHA, apply_diff uses the metadata payload of the diff to rebuild v2.

@@ -483,7 +483,8 @@ pub fn decode_session_full(
                     Err(_) => {
                         let mut found_sync = false;
                         for i in (start_loom_pos + 4)..(loom_frames_payload.len() - 1) {
-                            if loom_frames_payload[i] == 0xF8 && loom_frames_payload[i + 1] == 0xA5 {
+                            if loom_frames_payload[i] == 0xF8 && loom_frames_payload[i + 1] == 0xA5
+                            {
                                 loom_pos = i - 4;
                                 found_sync = true;
                                 break;
@@ -497,11 +498,15 @@ pub fn decode_session_full(
                             out_tracks[t].len()
                         } else if loom_pos < loom_frames_payload.len() {
                             let mut next_length_buf = [0u8; 4];
-                            next_length_buf.copy_from_slice(&loom_frames_payload[loom_pos..loom_pos + 4]);
+                            next_length_buf
+                                .copy_from_slice(&loom_frames_payload[loom_pos..loom_pos + 4]);
                             let next_length = u32::from_be_bytes(next_length_buf) as usize;
-                            let mut next_reader_loom =
-                                BitReader::new(&loom_frames_payload[loom_pos + 4..loom_pos + 4 + next_length]);
-                            if let Ok((f, _)) = Frame::deserialize_loom(&mut next_reader_loom, bps, &mut []) {
+                            let mut next_reader_loom = BitReader::new(
+                                &loom_frames_payload[loom_pos + 4..loom_pos + 4 + next_length],
+                            );
+                            if let Ok((f, _)) =
+                                Frame::deserialize_loom(&mut next_reader_loom, bps, &mut [])
+                            {
                                 f.channel_layout.channels() as usize
                             } else {
                                 1

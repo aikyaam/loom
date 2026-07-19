@@ -130,8 +130,8 @@ fn test_session_roundtrip() {
     let tracks = vec![track0, track1];
     let names = vec!["drums".to_string(), "synth".to_string()];
 
-    let compressed =
-        encode_session(&tracks, &names, 44100, 16, 512, None, None, None).expect("Session encoding failed");
+    let compressed = encode_session(&tracks, &names, 44100, 16, 512, None, None, None)
+        .expect("Session encoding failed");
 
     let (decoded, header) = decode_session(&compressed).expect("Session decoding failed");
 
@@ -174,8 +174,8 @@ fn test_range_extraction() {
     let tracks = vec![track0.clone(), track1.clone()];
     let names = vec!["drums".to_string(), "synth".to_string()];
 
-    let compressed =
-        encode_session(&tracks, &names, 44100, 16, 512, None, None, None).expect("Session encoding failed");
+    let compressed = encode_session(&tracks, &names, 44100, 16, 512, None, None, None)
+        .expect("Session encoding failed");
 
     let (sliced0, _) =
         decode_track_partial(&compressed, 0, 300, 1200).expect("Range decoding failed on Track 0");
@@ -199,8 +199,8 @@ fn test_non_destructive_edits() {
     let tracks = vec![track0];
     let names = vec!["constant".to_string()];
 
-    let compressed_v1 =
-        encode_session(&tracks, &names, 44100, 16, 256, None, None, None).expect("Session encoding failed");
+    let compressed_v1 = encode_session(&tracks, &names, 44100, 16, 256, None, None, None)
+        .expect("Session encoding failed");
 
     let mut track_edits = TrackEdits::new();
     track_edits.mutes.push(MuteRegion {
@@ -218,7 +218,8 @@ fn test_non_destructive_edits() {
     tracks_edits.insert(0u16, track_edits);
     let edit_block = EditBlock { tracks_edits };
 
-    let (decoded_tracks, header, _, tags, picture) = decode_session_full(&compressed_v1).expect("Decoding failed");
+    let (decoded_tracks, header, _, tags, picture) =
+        decode_session_full(&compressed_v1).expect("Decoding failed");
     let compressed_v2 = encode_session(
         &decoded_tracks,
         &names,
@@ -228,7 +229,8 @@ fn test_non_destructive_edits() {
         Some(&edit_block),
         tags.as_ref(),
         picture.as_ref(),
-    ).expect("Updating edits failed");
+    )
+    .expect("Updating edits failed");
 
     let (decoded, _) = decode_session(&compressed_v2).expect("Decoding modified session failed");
 
@@ -281,11 +283,11 @@ fn test_version_diffing() {
     }
     let tracks_v2 = vec![vec![track_v2]];
 
-    let compressed_v1 =
-        encode_session(&tracks_v1, &names, 44100, 16, 256, None, None, None).expect("V1 encoding failed");
+    let compressed_v1 = encode_session(&tracks_v1, &names, 44100, 16, 256, None, None, None)
+        .expect("V1 encoding failed");
 
-    let compressed_v2 =
-        encode_session(&tracks_v2, &names, 44100, 16, 256, None, None, None).expect("V2 encoding failed");
+    let compressed_v2 = encode_session(&tracks_v2, &names, 44100, 16, 256, None, None, None)
+        .expect("V2 encoding failed");
 
     let diff = encode_diff(&compressed_v1, &compressed_v2).expect("Diff encoding failed");
 
@@ -319,7 +321,8 @@ fn test_sync_recovery() {
     let tracks = vec![vec![track0], vec![track1]];
     let names = vec!["drums".to_string(), "synth".to_string()];
 
-    let compressed = encode_session(&tracks, &names, 44100, 16, 256, None, None, None).expect("Encoding failed");
+    let compressed =
+        encode_session(&tracks, &names, 44100, 16, 256, None, None, None).expect("Encoding failed");
 
     let mut v2_bytes = compressed.clone();
 
@@ -338,16 +341,15 @@ fn test_sync_recovery() {
 
 #[test]
 fn test_picture_block() {
-    use loom_core::{
-        decode_session_full, encode_session, PictureBlock, PictureType,
-    };
+    use loom_core::{decode_session_full, encode_session, PictureBlock, PictureType};
 
     let length = 512;
     let track = vec![1000i64; length];
     let tracks = vec![vec![track]];
     let names = vec!["drums".to_string()];
 
-    let compressed = encode_session(&tracks, &names, 44100, 16, 256, None, None, None).expect("Encoding failed");
+    let compressed =
+        encode_session(&tracks, &names, 44100, 16, 256, None, None, None).expect("Encoding failed");
 
     let original_picture = PictureBlock {
         picture_type: PictureType::FrontCover,
@@ -360,7 +362,8 @@ fn test_picture_block() {
         data: vec![0xCA, 0xFE, 0xBA, 0xBE],
     };
 
-    let (decoded_tracks, header, edits, tags, _) = decode_session_full(&compressed).expect("Decoding failed");
+    let (decoded_tracks, header, edits, tags, _) =
+        decode_session_full(&compressed).expect("Decoding failed");
     let updated = encode_session(
         &decoded_tracks,
         &names,
@@ -370,7 +373,8 @@ fn test_picture_block() {
         edits.as_ref(),
         tags.as_ref(),
         Some(&original_picture),
-    ).expect("Failed to append picture block");
+    )
+    .expect("Failed to append picture block");
 
     let (_, _, _, _, decoded_picture) =
         decode_session_full(&updated).expect("Failed to decode session containing picture block");
