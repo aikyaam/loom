@@ -3,6 +3,7 @@
 [![Language](https://img.shields.io/badge/language-Rust-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Format](https://img.shields.io/badge/format-Hybrid%20FLAC-brightgreen.svg)](#hybrid-container-architecture)
+[![Rust CI](https://github.com/aikyaam/loom/actions/workflows/ci.yml/badge.svg)](https://github.com/aikyaam/loom/actions/workflows/ci.yml)
 
 Loom is a high-performance, **session-aware lossless audio codec** designed specifically for multi-track audio projects, stem archiving, and Digital Audio Workstation (DAW) timeline engines. 
 
