@@ -1,0 +1,90 @@
+name: Publish Releases
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Build and Publish
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: loom
+            asset_name: loom-linux-x86_64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: loom.exe
+            asset_name: loom-windows-x86_64.exe
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: loom
+            asset_name: loom-macos-x86_64
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: ${{ matrix.target }}
+
+    - name: Install Linux dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2-dev
+
+    - name: Build release binary
+      run: cargo build --release --target ${{ matrix.target }} --bin loom
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.asset_name }}
+        path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+
+  release:
+    name: Create GitHub Release
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Prepare assets for release
+      run: |
+        mkdir -p release_assets
+        # Linux
+        cp artifacts/loom-linux-x86_64/loom release_assets/loom-linux-x86_64
+        chmod +x release_assets/loom-linux-x86_64
+        # MacOS
+        cp artifacts/loom-macos-x86_64/loom release_assets/loom-macos-x86_64
+        chmod +x release_assets/loom-macos-x86_64
+        # Windows
+        cp artifacts/loom-windows-x86_64.exe/loom.exe release_assets/loom-windows-x86_64.exe
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          release_assets/loom-linux-x86_64
+          release_assets/loom-macos-x86_64
+          release_assets/loom-windows-x86_64.exe
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
