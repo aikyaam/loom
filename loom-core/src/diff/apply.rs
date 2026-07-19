@@ -47,7 +47,6 @@ pub fn apply_diff(v1_bytes: &[u8], diff: &SessionDiff) -> io::Result<Vec<u8>> {
                     out.write_all(&v1_frames[t][base_idx])?;
                 }
                 FrameInstruction::Insert { frame_bytes } => {
-                    out.write_all(&(frame_bytes.len() as u32).to_be_bytes())?;
                     out.write_all(frame_bytes)?;
                 }
             }

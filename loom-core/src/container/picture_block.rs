@@ -72,11 +72,6 @@ impl PictureBlock {
         let mime_bytes = self.mime_type.as_bytes();
         let desc_bytes = self.description.as_bytes();
 
-        let len =
-            4 + 4 + mime_bytes.len() + 4 + desc_bytes.len() + 4 + 4 + 4 + 4 + 4 + self.data.len();
-
-        writer.write_all(&(len as u32).to_be_bytes())?;
-
         let ptype = self.picture_type.clone() as u32;
         writer.write_all(&ptype.to_be_bytes())?;
 

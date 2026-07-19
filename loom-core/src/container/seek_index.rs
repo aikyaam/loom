@@ -44,6 +44,18 @@ impl SeekTable {
     }
 
     pub fn deserialize<R: Read>(reader: &mut R) -> io::Result<Self> {
+        let mut magic = [0u8; 1];
+        reader.read_exact(&mut magic)?;
+        if magic[0] != 0x00 {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "Invalid SeekTable magic identifier",
+            ));
+        }
+
+        let mut len_buf = [0u8; 4];
+        reader.read_exact(&mut len_buf)?;
+
         let mut nt_buf = [0u8; 2];
         reader.read_exact(&mut nt_buf)?;
         let num_tracks = u16::from_be_bytes(nt_buf) as usize;

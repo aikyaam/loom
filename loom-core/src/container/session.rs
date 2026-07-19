@@ -114,27 +114,51 @@ pub fn encode_session(
                     .copy_from_slice(&tracks[t][ch][offset..(offset + current_block_size)]);
             }
 
-            let (stereo_mode, ch0, ch1) = if track_ch_count == 2 {
-                search_stereo_mode(&block_channels[0], &block_channels[1])
-            } else {
-                (
-                    StereoMode::Independent,
-                    block_channels[0].clone(),
-                    Vec::new(),
-                )
-            };
+            let mut subframes = Vec::new();
+            let mut stereo_mode = StereoMode::Independent;
+            if track_ch_count == 2 {
+                let (sm, ch0, ch1) = search_stereo_mode(&block_channels[0], &block_channels[1]);
+                stereo_mode = sm;
 
-            let w0 = compute_wasted_bits(&ch0);
-            let shifted0 = if w0 > 0 {
-                ch0.iter().map(|&x| x >> w0).collect()
-            } else {
-                ch0.clone()
-            };
-            let mut mode0 = search_predictor(&shifted0, bps - w0 as usize);
+                let w0 = compute_wasted_bits(&ch0);
+                let shifted0 = if w0 > 0 {
+                    ch0.iter().map(|&x| x >> w0).collect()
+                } else {
+                    ch0.clone()
+                };
+                let mut mode0 = search_predictor(&shifted0, bps - w0 as usize);
 
-            let mut w1 = 0;
-            let mode1 = if track_ch_count == 2 {
-                w1 = compute_wasted_bits(&ch1);
+                let mut ref_track = None;
+                let mut ref_weight = 0i8;
+
+                if t > 0 {
+                    if let Some(ref_res) = &ref_residuals {
+                        if let PredictionMode::Fixed { residuals, .. } = &mut mode0 {
+                            let (w, saved) = calculate_cross_coupling(residuals, ref_res);
+                            if saved > 8 {
+                                apply_cross_prediction(residuals, ref_res, w);
+                                ref_track = Some(0);
+                                ref_weight = w;
+                            }
+                        } else if let PredictionMode::Lpc { residuals, .. } = &mut mode0 {
+                            let (w, saved) = calculate_cross_coupling(residuals, ref_res);
+                            if saved > 8 {
+                                apply_cross_prediction(residuals, ref_res, w);
+                                ref_track = Some(0);
+                                ref_weight = w;
+                            }
+                        }
+                    }
+                }
+
+                subframes.push(Subframe {
+                    mode: mode0,
+                    ref_track,
+                    ref_weight,
+                    wasted_bits: w0,
+                });
+
+                let w1 = compute_wasted_bits(&ch1);
                 let side_bps = if stereo_mode == StereoMode::Independent {
                     bps
                 } else {
@@ -145,57 +169,62 @@ pub fn encode_session(
                 } else {
                     ch1.clone()
                 };
-                Some(search_predictor(&shifted1, side_bps - w1 as usize))
-            } else {
-                None
-            };
-
-            if t == 0 {
-                if let PredictionMode::Fixed { residuals, .. } = &mode0 {
-                    ref_residuals = Some(residuals.clone());
-                } else if let PredictionMode::Lpc { residuals, .. } = &mode0 {
-                    ref_residuals = Some(residuals.clone());
-                }
-            }
-
-            let mut ref_track = None;
-            let mut ref_weight = 0i8;
-
-            if t > 0 {
-                if let Some(ref_res) = &ref_residuals {
-                    if let PredictionMode::Fixed { residuals, .. } = &mut mode0 {
-                        let (w, saved) = calculate_cross_coupling(residuals, ref_res);
-                        if saved > 8 {
-                            apply_cross_prediction(residuals, ref_res, w);
-                            ref_track = Some(0);
-                            ref_weight = w;
-                        }
-                    } else if let PredictionMode::Lpc { residuals, .. } = &mut mode0 {
-                        let (w, saved) = calculate_cross_coupling(residuals, ref_res);
-                        if saved > 8 {
-                            apply_cross_prediction(residuals, ref_res, w);
-                            ref_track = Some(0);
-                            ref_weight = w;
-                        }
-                    }
-                }
-            }
-
-            let mut subframes = Vec::new();
-            subframes.push(Subframe {
-                mode: mode0,
-                ref_track,
-                ref_weight,
-                wasted_bits: w0,
-            });
-
-            if let Some(m1) = mode1 {
+                let mode1 = search_predictor(&shifted1, side_bps - w1 as usize);
                 subframes.push(Subframe {
-                    mode: m1,
+                    mode: mode1,
                     ref_track: None,
                     ref_weight: 0,
                     wasted_bits: w1,
                 });
+            } else {
+                for ch in 0..track_ch_count {
+                    let ch_data = &block_channels[ch];
+                    let w = compute_wasted_bits(ch_data);
+                    let shifted = if w > 0 {
+                        ch_data.iter().map(|&x| x >> w).collect()
+                    } else {
+                        ch_data.clone()
+                    };
+                    let mut mode = search_predictor(&shifted, bps - w as usize);
+
+                    let mut ref_track = None;
+                    let mut ref_weight = 0i8;
+
+                    if t > 0 && ch == 0 {
+                        if let Some(ref_res) = &ref_residuals {
+                            if let PredictionMode::Fixed { residuals, .. } = &mut mode {
+                                let (w, saved) = calculate_cross_coupling(residuals, ref_res);
+                                if saved > 8 {
+                                    apply_cross_prediction(residuals, ref_res, w);
+                                    ref_track = Some(0);
+                                    ref_weight = w;
+                                }
+                            } else if let PredictionMode::Lpc { residuals, .. } = &mut mode {
+                                let (w, saved) = calculate_cross_coupling(residuals, ref_res);
+                                if saved > 8 {
+                                    apply_cross_prediction(residuals, ref_res, w);
+                                    ref_track = Some(0);
+                                    ref_weight = w;
+                                }
+                            }
+                        }
+                    }
+
+                    if t == 0 && ch == 0 {
+                        if let PredictionMode::Fixed { residuals, .. } = &mode {
+                            ref_residuals = Some(residuals.clone());
+                        } else if let PredictionMode::Lpc { residuals, .. } = &mode {
+                            ref_residuals = Some(residuals.clone());
+                        }
+                    }
+
+                    subframes.push(Subframe {
+                        mode,
+                        ref_track,
+                        ref_weight,
+                        wasted_bits: w,
+                    });
+                }
             }
 
             use crate::container::frame::ChannelLayout;
@@ -429,22 +458,90 @@ pub fn decode_session_full(
     let mut reader0 = BitReader::new(track0_payload);
     let mut loom_pos = 0;
 
+    let mut track0_block_size = 512;
+
     while current_samples[0] < header.tracks[0].total_samples {
         for t in 0..num_tracks {
             let (frame, _) = if t == 0 && !is_old_format {
                 let f = Frame::deserialize_flac(&mut reader0, bps, &mut [])?;
+                track0_block_size = f.block_size;
                 (f, 0)
             } else {
                 let mut length_buf = [0u8; 4];
                 length_buf.copy_from_slice(&loom_frames_payload[loom_pos..loom_pos + 4]);
                 let length = u32::from_be_bytes(length_buf) as usize;
+                let start_loom_pos = loom_pos;
                 loom_pos += 4;
 
                 let mut reader_loom =
                     BitReader::new(&loom_frames_payload[loom_pos..loom_pos + length]);
-                let res = Frame::deserialize_loom(&mut reader_loom, bps, &mut [])?;
-                loom_pos += length;
-                res
+                match Frame::deserialize_loom(&mut reader_loom, bps, &mut []) {
+                    Ok((f, _)) => {
+                        loom_pos += length;
+                        (f, start_loom_pos)
+                    }
+                    Err(_) => {
+                        let mut found_sync = false;
+                        for i in (start_loom_pos + 4)..(loom_frames_payload.len() - 1) {
+                            if loom_frames_payload[i] == 0xF8 && loom_frames_payload[i + 1] == 0xA5 {
+                                loom_pos = i - 4;
+                                found_sync = true;
+                                break;
+                            }
+                        }
+                        if !found_sync {
+                            loom_pos = loom_frames_payload.len();
+                        }
+
+                        let channels_count = if !out_tracks[t].is_empty() {
+                            out_tracks[t].len()
+                        } else if loom_pos < loom_frames_payload.len() {
+                            let mut next_length_buf = [0u8; 4];
+                            next_length_buf.copy_from_slice(&loom_frames_payload[loom_pos..loom_pos + 4]);
+                            let next_length = u32::from_be_bytes(next_length_buf) as usize;
+                            let mut next_reader_loom =
+                                BitReader::new(&loom_frames_payload[loom_pos + 4..loom_pos + 4 + next_length]);
+                            if let Ok((f, _)) = Frame::deserialize_loom(&mut next_reader_loom, bps, &mut []) {
+                                f.channel_layout.channels() as usize
+                            } else {
+                                1
+                            }
+                        } else {
+                            1
+                        };
+
+                        use crate::container::frame::ChannelLayout;
+                        let dummy_layout = match channels_count {
+                            1 => ChannelLayout::Mono,
+                            2 => ChannelLayout::Stereo,
+                            3 => ChannelLayout::Surround3_0,
+                            4 => ChannelLayout::Quad,
+                            5 => ChannelLayout::Surround5_0,
+                            6 => ChannelLayout::Surround5_1,
+                            7 => ChannelLayout::Surround7_0,
+                            8 => ChannelLayout::Surround7_1,
+                            _ => ChannelLayout::Mono,
+                        };
+
+                        let dummy_subframes = vec![
+                            crate::container::frame::Subframe {
+                                mode: crate::predict::PredictionMode::Constant(0),
+                                ref_track: None,
+                                ref_weight: 0,
+                                wasted_bits: 0,
+                            };
+                            channels_count
+                        ];
+
+                        let f = Frame {
+                            frame_seq: 0,
+                            block_size: track0_block_size,
+                            channel_layout: dummy_layout,
+                            subframes: dummy_subframes,
+                        };
+                        (f, start_loom_pos)
+                    }
+                }
             };
 
             let channels = frame.channel_layout.channels() as usize;

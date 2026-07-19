@@ -1,15 +1,15 @@
 use crate::container::header::SessionHeader;
 use std::io;
 
-pub fn decode_track(session_bytes: &[u8], track_idx: usize) -> io::Result<Vec<Vec<i64>>> {
-    let (mut tracks, _, _, _, _) = crate::container::session::decode_session_full(session_bytes)?;
-    if track_idx >= tracks.len() {
+pub fn decode_track(session_bytes: &[u8]) -> io::Result<(Vec<Vec<i64>>, SessionHeader)> {
+    let (mut tracks, header, _, _, _) = crate::container::session::decode_session_full(session_bytes)?;
+    if tracks.is_empty() {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
-            format!("Track {} out of bounds", track_idx),
+            "No tracks found in session container",
         ));
     }
-    Ok(std::mem::take(&mut tracks[track_idx]))
+    Ok((std::mem::take(&mut tracks[0]), header))
 }
 
 pub fn decode_track_partial(

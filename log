@@ -1,0 +1,30 @@
+error[E0061]: this function takes 2 arguments but 1 argument was supplied
+  --> loom-core/tests/variable_block_size.rs:27:29
+   |
+27 |     let (decoded, header) = decode_track(&compressed).expect("Decoding failed");
+   |                             ^^^^^^^^^^^^------------- argument #2 of type `usize` is missing
+   |
+note: function defined here
+  --> loom-core/src/decoder.rs:4:8
+   |
+ 4 | pub fn decode_track(session_bytes: &[u8], track_idx: usize) -> io::Result<Vec<Vec<i64>>> {
+   |        ^^^^^^^^^^^^
+help: provide the argument
+   |
+27 |     let (decoded, header) = decode_track(&compressed, /* usize */).expect("Decoding failed");
+   |                                                     +++++++++++++
+error[E0308]: mismatched types
+  --> loom-core/tests/variable_block_size.rs:27:9
+   |
+27 |     let (decoded, header) = decode_track(&compressed).expect("Decoding failed");
+   |         ^^^^^^^^^^^^^^^^^   --------------------------------------------------- this expression has type `std::vec::Vec<std::vec::Vec<i64>>`
+   |         |
+   |         expected `Vec<Vec<i64>>`, found `(_, _)`
+   |
+   = note: expected struct `std::vec::Vec<std::vec::Vec<i64>>`
+               found tuple `(_, _)`
+Some errors have detailed explanations: E0061, E0308.
+For more information about an error, try `rustc --explain E0061`.
+error: could not compile `loom-core` (test "variable_block_size") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+Error: Process completed with exit code 101.
