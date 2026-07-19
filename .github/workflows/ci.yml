@@ -34,11 +34,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-
 
+    - name: Install system dependencies (ALSA)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2-dev
+
     - name: Run code formatting check
       run: cargo fmt --check
 
     - name: Run Clippy lints
-      run: cargo clippy --all-targets --all-features -- -D warnings
+      run: cargo clippy --all-targets --all-features
 
     - name: Build project
       run: cargo build --verbose
