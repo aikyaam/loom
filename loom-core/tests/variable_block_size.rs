@@ -24,7 +24,7 @@ fn test_variable_block_size_transient() {
     let compressed =
         encode_track(&pcm, 44100, 16, 1000, "transient_track").expect("Encoding failed");
 
-    let (decoded, header) = decode_track(&compressed).expect("Decoding failed");
+    let (decoded, _header) = decode_track(&compressed).expect("Decoding failed");
 
     assert_eq!(decoded[0].len(), total_samples);
     assert_eq!(decoded[0], channel);

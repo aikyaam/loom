@@ -11,6 +11,7 @@ pub mod encoder;
 pub mod entropy;
 pub mod ffi;
 pub mod predict;
+pub mod transform;
 pub mod verify;
 
 pub use config::{CompressionLevel, EncoderConfig};

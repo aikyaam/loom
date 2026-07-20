@@ -46,7 +46,7 @@ pub fn rans_encode_bytes(data: &[u8]) -> Vec<u8> {
 #[derive(Clone, Debug)]
 pub struct RansDecoder {
     state: u32,
-    offset: usize,
+    _offset: usize,
 }
 
 impl RansDecoder {
@@ -58,7 +58,7 @@ impl RansDecoder {
             | ((stream[1] as u32) << 16)
             | ((stream[2] as u32) << 8)
             | (stream[3] as u32);
-        Some((RansDecoder { state, offset: 4 }, stream.len()))
+        Some((RansDecoder { state, _offset: 4 }, stream.len()))
     }
 
     pub fn get_state(&self) -> u32 {

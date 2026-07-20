@@ -4,7 +4,7 @@ use hound::{WavReader, WavSpec, WavWriter};
 use loom_core::config::EncoderConfig;
 use loom_core::container::header::SessionHeader;
 use loom_core::verify::{compute_pcm_md5, verify_stream};
-use loom_core::{decode_session, decode_session_full, decode_track, encode_session_with_config, encode_track};
+use loom_core::{decode_session, decode_session_full, decode_track, encode_session_with_config};
 use std::fs::{self, File};
 use std::io::{Cursor, Read, Write};
 use std::path::Path;
@@ -869,9 +869,18 @@ fn main() -> Result<()> {
             let uncompressed_bytes = total_samples * channels.len() * (bit_depth as usize / 8);
             let duration_sec = total_samples as f64 / sample_rate as f64;
 
-            println!("Input Spec: {} channels, {} Hz, {}-bit, {:.2} sec audio ({:.2} MB uncompressed)",
-                     channels.len(), sample_rate, bit_depth, duration_sec, uncompressed_bytes as f64 / 1_048_576.0);
-            println!("{:<8} {:<14} {:<14} {:<14} {:<12}", "Level", "Compress Time", "Decompress Time", "Comp Ratio", "Throughput");
+            println!(
+                "Input Spec: {} channels, {} Hz, {}-bit, {:.2} sec audio ({:.2} MB uncompressed)",
+                channels.len(),
+                sample_rate,
+                bit_depth,
+                duration_sec,
+                uncompressed_bytes as f64 / 1_048_576.0
+            );
+            println!(
+                "{:<8} {:<14} {:<14} {:<14} {:<12}",
+                "Level", "Compress Time", "Decompress Time", "Comp Ratio", "Throughput"
+            );
             println!("{:-<65}", "");
 
             let track_names = vec!["benchmark_stem".to_string()];
@@ -881,8 +890,15 @@ fn main() -> Result<()> {
                 let config = EncoderConfig::new(level, 4096, sample_rate, bit_depth);
 
                 let start_enc = std::time::Instant::now();
-                let compressed = encode_session_with_config(&session_data, &track_names, &config, None, None, None)
-                    .map_err(|e| anyhow!("Benchmark encode failed: {}", e))?;
+                let compressed = encode_session_with_config(
+                    &session_data,
+                    &track_names,
+                    &config,
+                    None,
+                    None,
+                    None,
+                )
+                .map_err(|e| anyhow!("Benchmark encode failed: {}", e))?;
                 let enc_dur = start_enc.elapsed();
 
                 let start_dec = std::time::Instant::now();
@@ -894,8 +910,10 @@ fn main() -> Result<()> {
                 let mb_per_sec = (uncompressed_bytes as f64 / 1_048_576.0) / enc_dur.as_secs_f64();
 
                 assert_eq!(decoded_tracks.len(), 1);
-                println!("Level {:<2} {:<14.2?} {:<14.2?} {:<13.2}% {:<10.2} MB/s",
-                         level, enc_dur, dec_dur, ratio, mb_per_sec);
+                println!(
+                    "Level {:<2} {:<14.2?} {:<14.2?} {:<13.2}% {:<10.2} MB/s",
+                    level, enc_dur, dec_dur, ratio, mb_per_sec
+                );
             }
         }
         Commands::Analyze { input } => {
@@ -920,11 +938,17 @@ fn main() -> Result<()> {
                     } else {
                         0
                     };
-                    println!("  Track {}: '{}' ({} total samples, {} pcm decoded)", idx, trk.name, trk.total_samples, pcm_len);
+                    println!(
+                        "  Track {}: '{}' ({} total samples, {} pcm decoded)",
+                        idx, trk.name, trk.total_samples, pcm_len
+                    );
                 }
 
                 if let Some(e) = edits {
-                    println!("  Edit Overlays: Active ({} track edit entries)", e.tracks_edits.len());
+                    println!(
+                        "  Edit Overlays: Active ({} track edit entries)",
+                        e.tracks_edits.len()
+                    );
                 } else {
                     println!("  Edit Overlays: None");
                 }
@@ -933,8 +957,8 @@ fn main() -> Result<()> {
                     println!("  Metadata Tags: {} entries", t.tags.len());
                 }
             } else {
-                let (decoded, header) = decode_track(&data)
-                    .map_err(|e| anyhow!("Failed to decode track: {}", e))?;
+                let (decoded, header) =
+                    decode_track(&data).map_err(|e| anyhow!("Failed to decode track: {}", e))?;
                 let samples = decoded.first().map(|ch| ch.len()).unwrap_or(0);
                 println!("Single-Track Overview:");
                 println!("  Magic: Custom Single Track");
@@ -949,10 +973,10 @@ fn main() -> Result<()> {
             let p1 = Path::new(&file1);
             let p2 = Path::new(&file2);
 
-            let (ch1, sr1, bd1) = read_audio_file(p1)
-                .map_err(|e| anyhow!("Failed to read file 1: {}", e))?;
-            let (ch2, sr2, bd2) = read_audio_file(p2)
-                .map_err(|e| anyhow!("Failed to read file 2: {}", e))?;
+            let (ch1, sr1, bd1) =
+                read_audio_file(p1).map_err(|e| anyhow!("Failed to read file 1: {}", e))?;
+            let (ch2, sr2, bd2) =
+                read_audio_file(p2).map_err(|e| anyhow!("Failed to read file 2: {}", e))?;
 
             let len1 = fs::metadata(p1)?.len();
             let len2 = fs::metadata(p2)?.len();
@@ -965,7 +989,15 @@ fn main() -> Result<()> {
 
             println!("File 1 Size: {} bytes ({})", len1, file1);
             println!("File 2 Size: {} bytes ({})", len2, file2);
-            println!("Specs: File 1 ({}Hz, {}ch, {}bit) vs File 2 ({}Hz, {}ch, {}bit)", sr1, ch1.len(), bd1, sr2, ch2.len(), bd2);
+            println!(
+                "Specs: File 1 ({}Hz, {}ch, {}bit) vs File 2 ({}Hz, {}ch, {}bit)",
+                sr1,
+                ch1.len(),
+                bd1,
+                sr2,
+                ch2.len(),
+                bd2
+            );
 
             let diff_bytes = (len2 as f64 - len1 as f64).abs();
             let saved_pct = (diff_bytes / len1.max(len2) as f64) * 100.0;
@@ -984,7 +1016,7 @@ fn main() -> Result<()> {
             file.read_to_end(&mut data)?;
 
             if data.starts_with(b"fLaC") {
-                let (tracks, header, edits, tags, picture) = decode_session_full(&data)
+                let (_tracks, header, edits, tags, picture) = decode_session_full(&data)
                     .map_err(|e| anyhow!("Failed to parse container: {}", e))?;
 
                 println!("Stream Header:");
@@ -994,15 +1026,27 @@ fn main() -> Result<()> {
                 println!("  Stems Count: {}", header.tracks.len());
 
                 for (idx, trk) in header.tracks.iter().enumerate() {
-                    let md5_hex = trk.md5.iter().map(|b| format!("{:02x}", b)).collect::<String>();
-                    println!("    [{}] Track: '{}' | Samples: {} | MD5: {}", idx, trk.name, trk.total_samples, md5_hex);
+                    let md5_hex = trk
+                        .md5
+                        .iter()
+                        .map(|b| format!("{:02x}", b))
+                        .collect::<String>();
+                    println!(
+                        "    [{}] Track: '{}' | Samples: {} | MD5: {}",
+                        idx, trk.name, trk.total_samples, md5_hex
+                    );
                 }
 
                 if let Some(e) = edits {
                     println!("Edit Overlays:");
                     for (trk_idx, track_edits) in &e.tracks_edits {
-                        println!("    Track {}: {} mutes, {} fades, {} gain automation points",
-                                 trk_idx, track_edits.mutes.len(), track_edits.fades.len(), track_edits.gain_points.len());
+                        println!(
+                            "    Track {}: {} mutes, {} fades, {} gain automation points",
+                            trk_idx,
+                            track_edits.mutes.len(),
+                            track_edits.fades.len(),
+                            track_edits.gain_points.len()
+                        );
                     }
                 }
 
@@ -1018,8 +1062,8 @@ fn main() -> Result<()> {
                     println!("    MIME: {} | Size: {} bytes", p.mime_type, p.data.len());
                 }
             } else {
-                let (decoded, header) = decode_track(&data)
-                    .map_err(|e| anyhow!("Failed to decode track: {}", e))?;
+                let (decoded, header) =
+                    decode_track(&data).map_err(|e| anyhow!("Failed to decode track: {}", e))?;
                 println!("Single-Track Header:");
                 println!("  Sample Rate: {} Hz", header.sample_rate);
                 println!("  Channels: {}", decoded.len());

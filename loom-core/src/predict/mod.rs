@@ -1,4 +1,5 @@
 pub mod fixed;
+pub mod lms;
 pub mod lpc;
 pub mod simd;
 
@@ -192,17 +193,11 @@ pub fn search_predictor(samples: &[i64], bps: usize, level: CompressionLevel) ->
                 vec![15]
             };
             for &qlp_precision in &precisions {
-                let (qlp_coeffs, qlp_shift) =
-                    quantize_lpc_coefficients(&refined, qlp_precision);
+                let (qlp_coeffs, qlp_shift) = quantize_lpc_coefficients(&refined, qlp_precision);
                 let residuals = compute_lpc_residuals(samples, &qlp_coeffs, qlp_shift, order);
                 let overhead = (order * bps) as u64 + 4 + 5 + (order * qlp_precision) as u64;
-                let (_, res_bits) = find_best_partition_order(
-                    &residuals,
-                    order,
-                    max_part_order,
-                    rice_search,
-                    bps,
-                );
+                let (_, res_bits) =
+                    find_best_partition_order(&residuals, order, max_part_order, rice_search, bps);
                 let total_bits = overhead + res_bits;
                 if total_bits < best_order_total {
                     best_order_total = total_bits;

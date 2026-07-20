@@ -690,16 +690,6 @@ impl Frame {
     }
 }
 
-trait CustomOptionExt<T> {
-    fn ok_ok(self, err: &str) -> io::Result<T>;
-}
-
-impl<T> CustomOptionExt<T> for Option<T> {
-    fn ok_ok(self, err: &str) -> io::Result<T> {
-        self.ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, err.to_string()))
-    }
-}
-
 pub fn crc16(data: &[u8]) -> u16 {
     let mut crc: u16 = 0;
     for &byte in data {

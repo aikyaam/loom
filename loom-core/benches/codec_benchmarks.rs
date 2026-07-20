@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use loom_core::config::{CompressionConfig, CompressionLevel};
+use loom_core::config::EncoderConfig;
 use loom_core::{decode_track, encode_track_with_config};
 
 fn generate_test_signal(num_samples: usize) -> Vec<i64> {
@@ -15,28 +15,14 @@ fn generate_test_signal(num_samples: usize) -> Vec<i64> {
 }
 
 fn bench_encode_decode(c: &mut Criterion) {
-    let samples = generate_test_signal(44100 * 2);
-    let config = CompressionConfig {
-        level: CompressionLevel::Fast,
-        block_size: 4096,
-        do_mid_side: true,
-        do_cross_track: false,
-    };
+    let samples = vec![generate_test_signal(44100 * 2)];
+    let config = EncoderConfig::new(5, 4096, 44100, 16);
 
     c.bench_function("encode_track_fast", |b| {
-        b.iter(|| {
-            encode_track_with_config(
-                black_box(&samples),
-                44100,
-                16,
-                1,
-                &config,
-            )
-            .unwrap()
-        })
+        b.iter(|| encode_track_with_config(black_box(&samples), "bench_stem", &config).unwrap())
     });
 
-    let compressed = encode_track_with_config(&samples, 44100, 16, 1, &config).unwrap();
+    let compressed = encode_track_with_config(&samples, "bench_stem", &config).unwrap();
 
     c.bench_function("decode_track_fast", |b| {
         b.iter(|| decode_track(black_box(&compressed)).unwrap())
