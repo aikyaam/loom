@@ -47,7 +47,7 @@ To decode a time range `decode_range(track, start_sample, end_sample)`:
 
 ---
 
-## Independent Seek Performance: $OO(1) Time Complexity
+## Independent Seek Performance: O(1) Time Complexity
 
 Without a seek index, finding a range in a variable-bitrate stream requires reading and parsing every frame from the beginning of the file, which is an $O(N)$ operation (where $N$ is file length).
 With a seek index:

@@ -33,7 +33,7 @@ This paper establishes the formal benchmarking framework for **Loom**, defining 
 
 ## 3. Mathematical Evaluation Metrics
 
-### 3.1 Compression Ratio ($CR$) and Space Savings ($SS$)
+### 3.1 Compression Ratio (CR) and Space Savings (SS)
 
 Let $S_{\text{raw}}$ be the total uncompressed PCM size in bytes, and $S_{\text{comp}}$ be the compressed bitstream size in bytes.
 
@@ -41,7 +41,7 @@ $$\text{Compression Ratio } (CR) = \frac{S_{\text{raw}}}{S_{\text{comp}}}$$
 
 $$\text{Space Savings } (SS) = \left( 1 - \frac{S_{\text{comp}}}{S_{\text{raw}}} \right) \times 100\%$$
 
-### 3.2 Bits Per Sample ($BPS_{\text{compressed}}$)
+### 3.2 Bits Per Sample (BPS compressed)
 
 For an audio signal with bit depth $b$ (e.g., $b = 24$), total channels $C$, and total frame samples $N_{\text{total}}$:
 
