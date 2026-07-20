@@ -39,7 +39,7 @@ $$\text{Total Header Bytes}_{\text{indep}} = M \cdot H_{\text{single}} + M \cdot
 where $S_{\text{index}}$ is the seek point tuple byte size.
 
 In Loom's session container (`.loom`):
-$$\text{Total Header Bytes}_{\text{Loom}} = H_{\text{session}} + \sum_{m=1}^{M} H_{\text{track\_meta\_m}} + N_{\text{frames}} \cdot S_{\text{seek\_unified}}$$
+$$\text{Total Header Bytes}_{\text{Loom}} = H_{\text{session}} + \sum_{m=1}^{M} H_{\text{track-meta-m}} + N_{\text{frames}} \cdot S_{\text{seek-unified}}$$
 
 Because $H_{\text{session}}$ consolidates common properties (global sample rate, bit depth, artist metadata, edit overlay lists, session version trees), the container overhead reduction ratio $R_{\text{overhead}}$ scales linearly with the number of stems $M$:
 $$R_{\text{overhead}} = 1 - \frac{\text{Total Header Bytes}_{\text{Loom}}}{\text{Total Header Bytes}_{\text{indep}}} \approx 1 - \frac{1}{M}$$
@@ -77,7 +77,7 @@ Output: Decoded PCM stem matrices for target tracks T_active
 ## 5. Complexity Analysis
 
 - **Single-Track Extraction Time:** $\mathcal{O}(\log K)$ binary search in the unified seek index to jump directly to the target byte offset of track $m$, achieving $O(1)$ seek latency relative to file duration.
-- **Selective Track Demuxing Complexity:** $\mathcal{O}(N_{\text{active\_frames}})$ where non-active track payloads are bypassed in $O(1)$ pointer jumps without decompressing or allocating memory.
+- **Selective Track Demuxing Complexity:** $\mathcal{O}(N_{\text{active-frames}})$ where non-active track payloads are bypassed in $O(1)$ pointer jumps without decompressing or allocating memory.
 
 ---
 

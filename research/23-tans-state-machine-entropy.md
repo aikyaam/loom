@@ -37,7 +37,7 @@ Given a symbol $s$ with probability $p_s = f_s / L$ (where $f_s$ is the normaliz
 $$x' = C(s, x) = \left\lfloor \frac{x}{f_s} \right\rfloor \cdot L + \text{start}_s + (x \bmod f_s)$$
 
 The corresponding decoding function $D(x')$ decomposes state $x'$ into symbol $s$ and prior state $x$:
-$$s = \text{symbol\_table}[x' \bmod L]$$
+$$s = \text{symbol-table}[x' \bmod L]$$
 $$x = f_s \cdot \left\lfloor \frac{x'}{L} \right\rfloor + (x' \bmod L) - \text{start}_s$$
 
 Because $x' \bmod L$ indexes a pre-computed lookup table, decoding requires zero division or multiplication operations, reducing to a table array access and bitwise shift:
