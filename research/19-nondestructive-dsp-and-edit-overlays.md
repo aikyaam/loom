@@ -1,4 +1,4 @@
-# Research Paper 19: Non-Destructive Digital Signal Processing — Fade Curves, Gain Envelopes, Mute Masking, and O(1) Header-Only Session Editing
+# Research Paper 19: Non-Destructive Digital Signal Processing: Fade Curves, Gain Envelopes, Mute Masking, and O(1) Header-Only Session Editing
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-In Digital Audio Workstations (DAWs), sound engineers continuously apply timeline edits—such as muting silent vocal regions, fading track intros/outros, applying volume automation curves, and trimming clip boundaries.
+In Digital Audio Workstations (DAWs), sound engineers continuously apply timeline edits (such as muting silent vocal regions, fading track intros or outros, applying volume automation curves, and trimming clip boundaries).
 
 In traditional audio file formats (WAV, FLAC, MP3, AAC), applying an edit to an audio file requires **destructive re-rendering**:
 1. Decompressing the audio track to PCM.

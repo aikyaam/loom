@@ -1,4 +1,4 @@
-# Research Paper 10: Audio Transform Analysis — Reversible Integer Transforms (IntMDCT, Integer Wavelets) vs. Time-Domain Linear Prediction in Bit-Exact Lossless Compression
+# Research Paper 10: Audio Transform Analysis: Reversible Integer Transforms (IntMDCT, Integer Wavelets) vs. Time-Domain Linear Prediction in Bit-Exact Lossless Compression
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-A fundamental decision in audio compression architecture is choosing between **Time-Domain Predictive Coding** (e.g., Linear Predictive Coding - LPC) and **Frequency-Domain Transform Coding** (e.g., Discrete Fourier Transform - DFT, Modified Discrete Cosine Transform - MDCT, or Discrete Wavelet Transform - DWT).
+A fundamental decision in audio compression architecture is choosing between **Time-Domain Predictive Coding** (such as Linear Predictive Coding, LPC) and **Frequency-Domain Transform Coding** (such as Discrete Fourier Transform, DFT; Modified Discrete Cosine Transform, MDCT; or Discrete Wavelet Transform, DWT).
 
 In lossy audio codecs (such as AAC, MP3, Opus, Opus/Vorbis), transform coding dominates because human auditory perception (psychoacoustics) operates in the time-frequency domain via critical band masking. However, applying transform coding to **lossless, bit-exact compression** introduces severe theoretical and practical barriers:
 1. **Irrational Coefficients:** Standard MDCT/FFT kernels contain trigonometric constants ($\cos\frac{\pi k}{N}$, $\sin\frac{\pi k}{N}$) requiring floating-point arithmetic. Floating-point rounding is non-deterministic across hardware architectures (x86 vs. ARM vs. RISC-V), violating bit-exact reproducibility.

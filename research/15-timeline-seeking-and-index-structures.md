@@ -1,4 +1,4 @@
-# Research Paper 15: Timeline Seeking & Random Access Index Structures — O(1) Seek Tables, Sample-Accurate Range Extraction, and Multitrack Indexing
+# Research Paper 15: Timeline Seeking & Random Access Index Structures: O(1) Seek Tables, Sample-Accurate Range Extraction, and Multitrack Indexing
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -12,7 +12,7 @@ Digital Audio Workstation (DAW) timeline playback, playhead scrubbing, clip loop
 
 When a DAW user jumps the playhead to timestamp $t = 01:23.456$ on a 64-track session, the codec must locate the exact byte offset of the corresponding audio frame across all 64 tracks, decode the target block, and return PCM samples within a strict latency target ($\le 5 \text{ ms}$).
 
-In traditional linear streams without an index, seeking requires scanning sequential frame sync codes (`0xFFF8`), parsing frame headers, and counting sample lengths until reaching the target sample—a process with $\mathcal{O}(N_{\text{frames}})$ time complexity that causes severe UI lag during playhead scrubbing.
+In traditional linear streams without an index, seeking requires scanning sequential frame sync codes (`0xFFF8`), parsing frame headers, and counting sample lengths until reaching the target sample (a process with $\mathcal{O}(N_{\text{frames}})$ time complexity that causes severe UI lag during playhead scrubbing).
 
 This paper evaluates **FLAC Seek Table Blocks**, **Multitrack Secondary Indices**, **Interval Trees**, and **Skip Lists**, proving how Loom achieves **guaranteed $\mathcal{O}(1)$ or $\mathcal{O}(\log K)$ seek latency** for multi-stem sessions.
 

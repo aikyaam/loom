@@ -1,4 +1,4 @@
-# Research Paper 16: Version Control & Session Delta Compression — Frame-Level MD5 Fingerprinting, Content-Addressable Storage, and Session Reconstruction
+# Research Paper 16: Version Control & Session Delta Compression: Frame-Level MD5 Fingerprinting, Content-Addressable Storage, and Session Reconstruction
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,9 +8,9 @@
 
 ## 1. Problem Statement
 
-In professional DAW audio production, sound engineers and music producers continuously save successive revisions of a project session (e.g., `Song_Mix_v1.loom`, `Song_Mix_v2.loom`, `Song_Master_Final.loom`).
+In professional DAW audio production, sound engineers and music producers continuously save successive revisions of a project session (such as `Song_Mix_v1.loom`, `Song_Mix_v2.loom`, or `Song_Master_Final.loom`).
 
-In typical DAW projects, a new version modifies only a tiny fraction of the audio—such as re-recording a 4-bar vocal punch-in, tweaking a guitar intro, or updating non-destructive fade metadata. Storing each full session file independently results in **massive storage bloat**, duplicating gigabytes of identical multi-track audio frames across revisions.
+In typical DAW projects, a new version modifies only a tiny fraction of the audio (such as re-recording a 4-bar vocal punch-in, tweaking a guitar intro, or updating non-destructive fade metadata). Storing each full session file independently results in **massive storage bloat**, duplicating gigabytes of identical multi-track audio frames across revisions.
 
 Traditional byte-level delta tools (such as `xdelta`, `bsdiff`, or `VCDIFF`) operate on raw binary streams. Because re-encoding audio with even slight parameter shifts alters frame lengths and compressed byte boundaries, byte-level diffing algorithms fail to align audio streams, resulting in large delta sizes.
 

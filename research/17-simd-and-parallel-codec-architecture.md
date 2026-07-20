@@ -1,4 +1,4 @@
-# Research Paper 17: High-Performance Codec Architecture — SIMD Vectorization (AVX2, AVX-512, NEON), Multi-Thread Parallelism, and Memory Locality
+# Research Paper 17: High-Performance Codec Architecture: SIMD Vectorization (AVX2, AVX-512, NEON), Multi-Thread Parallelism, and Memory Locality
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,13 +8,13 @@
 
 ## 1. Problem Statement
 
-High-bitrate, multi-channel audio projects (e.g., 64 stems recorded at 24-bit / 96kHz) generate immense uncompressed data throughput:
+High-bitrate, multi-channel audio projects (such as 64 stems recorded at 24-bit / 96kHz) generate immense uncompressed data throughput:
 $$\text{Throughput} = 64 \text{ tracks} \times 96,000 \text{ samples/sec} \times 3 \text{ bytes/sample} \approx 18.43 \text{ MB/sec}$$
 
 For real-time DAW operations (such as live bounce-to-disk or multi-track playhead scrubbing across 64 tracks), a lossless codec must execute encoding and decoding at **over $100\times$ real-time speed** ($> 1.8 \text{ GB/sec}$).
 
 Achieving this performance requires exploiting modern CPU architecture capabilities:
-1. **Data Parallelism (SIMD):** Vectorizing inner computational loops—autocorrelation, fixed-predictor residual subtraction, stereo decorrelation, and cross-track prediction—using 256-bit (AVX2) and 128-bit (ARM NEON) SIMD registers.
+1. **Data Parallelism (SIMD):** Vectorizing inner computational loops (autocorrelation, fixed-predictor residual subtraction, stereo decorrelation, and cross-track prediction) using 256-bit (AVX2) and 128-bit (ARM NEON) SIMD registers.
 2. **Task Parallelism (Multi-Threading):** Scaling across multi-core CPUs using lock-free work-stealing thread pools (`Rayon`) without lock contention or thread synchronization bottlenecks.
 3. **Cache Locality & Memory Bandwidth:** Designing zero-allocation buffer pools to prevent dynamic heap allocations (`malloc`/`free`) inside inner frame-processing loops.
 

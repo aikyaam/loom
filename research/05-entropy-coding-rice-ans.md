@@ -1,4 +1,4 @@
-# Research Paper 05: Entropy Coding Theory — Golomb-Rice Coding, Asymmetric Numeral Systems (ANS), and Range Coding for Lossless Audio Residuals
+# Research Paper 05: Entropy Coding Theory: Golomb-Rice Coding, Asymmetric Numeral Systems (ANS), and Range Coding for Lossless Audio Residuals
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -15,7 +15,7 @@ $$H(E) = -\sum_{i} P(e_i) \log_2 P(e_i) \quad \text{bits/sample}$$
 
 The primary challenge is selecting an entropy coding scheme that maximizes compression ratio (approaching entropy $H(E)$) while achieving real-time decoding throughput (100+ MB/s per core) and maintaining bitstream specification compatibility.
 
-This paper evaluates **Golomb-Rice Coding**, **Huffman Coding**, **Range Coding**, and **Asymmetric Numeral Systems (tANS / rANS)**, modeling their theoretical coding efficiency, computational overhead, vectorization capabilities, and application to Loom's dual-architecture container.
+This paper evaluates **Golomb-Rice Coding**, **Huffman Coding**, **Range Coding**, and **Asymmetric Numeral Systems (tANS and rANS)**, modeling their theoretical coding efficiency, computational overhead, vectorization capabilities, and application to Loom's dual-architecture container.
 
 ---
 
@@ -25,8 +25,8 @@ This paper evaluates **Golomb-Rice Coding**, **Huffman Coding**, **Range Coding*
 - **Huffman Coding (1952):** David Huffman established optimal prefix-free codes for discrete symbol alphabets, but constrained symbol bit-lengths to integer values $\lceil -\log_2 P(s) \rceil$, causing inefficiency when symbol probabilities exceed 0.5.
 - **Golomb Coding (1966):** Solomon Golomb introduced optimal prefix coding for geometric distributions.
 - **Rice Coding (1979, 1991):** Robert F. Rice constrained Golomb parameters to powers of two ($M = 2^k$), enabling extremely fast implementation via binary bit-shifts (`>> k`) and masking (`& ((1<<k)-1)`). Rice coding became the standard for Shorten (1994), FLAC (2000), and ALAC (2004).
-- **Arithmetic & Range Coding (1976, 1998):** Pasco, Rissanen, and Martin developed arithmetic and range coding, representing whole messages as single fractional numbers in $[0, 1)$, achieving fractional bit precision per symbol.
-- **Asymmetric Numeral Systems (2006, 2014):** Jarek Duda invented ANS (and its implementations **tANS** - table ANS, **rANS** - range ANS), combining the exact fractional entropy performance of arithmetic coding with the ultra-fast state-machine execution of Huffman tables.
+- **Arithmetic and Range Coding (1976, 1998):** Pasco, Rissanen, and Martin developed arithmetic and range coding, representing whole messages as single fractional numbers in $[0, 1)$, achieving fractional bit precision per symbol.
+- **Asymmetric Numeral Systems (2006, 2014):** Jarek Duda invented ANS (including its implementations **tANS** (table ANS) and **rANS** (range ANS)), combining the exact fractional entropy performance of arithmetic coding with the fast state-machine execution of Huffman tables.
 
 ---
 

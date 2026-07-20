@@ -154,6 +154,6 @@ RESIDUAL := coding_method(2) partition_order(4) RICE_PARTITION+
 
 2. **Same subframe type taxonomy** (Constant, Verbatim, Fixed-0..4, LPC) with same bit layout for predictors and residuals, but different container framing.
 
-3. **Same Rice coding** — the entropy coding is unambiguously specified; we implement it identically.
+3. **Same Rice coding**: the entropy coding is unambiguously specified; we implement it identically.
 
 4. **MD5 checksum** stored in the session header for each track.

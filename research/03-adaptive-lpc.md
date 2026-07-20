@@ -6,7 +6,7 @@
 
 ## Motivation
 
-Fixed predictors use preset coefficients. Adaptive LPC computes per-block optimal coefficients from the block's own autocorrelation, achieving better compression — especially for tonal/periodic audio like music.
+Fixed predictors use preset coefficients. Adaptive LPC computes per-block optimal coefficients from the block's own autocorrelation, achieving better compression, especially for tonal and periodic audio like music.
 
 ---
 
@@ -30,7 +30,7 @@ Compute autocorrelation coefficients `R[0..order]`:
 R[k] = sum_{n=0}^{N-1-k} windowed[n] * windowed[n+k]
 ```
 
-If `R[0] == 0`, the block is silence — use CONSTANT or VERBATIM subframe.
+If `R[0] == 0`, the block is silence (use CONSTANT or VERBATIM subframe).
 
 ---
 
@@ -117,5 +117,5 @@ SUBFRAME_LPC:
 1. Autocorrelation + windowing: use f64 arithmetic.
 2. Levinson-Durbin: use f64, check stability (|k_i| ≥ 1 → fallback).
 3. Quantization: convert to i64 coefficients and store precision + shift.
-4. Decoder: pure integer arithmetic — no floats needed at decode time.
+4. Decoder: pure integer arithmetic (no floats needed at decode time).
 5. Order search: try orders 2, 4, 6, 8, 10, 12 (even orders tend to be better for audio) and the fixed predictors; pick smallest estimated bitcount.

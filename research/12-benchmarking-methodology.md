@@ -1,4 +1,4 @@
-# Research Paper 12: Codec Evaluation Methodology — Comprehensive Benchmark Framework, Dataset Taxonomy, and Empirical Testing Infrastructure
+# Research Paper 12: Codec Evaluation Methodology: Comprehensive Benchmark Framework, Dataset Taxonomy, and Empirical Testing Infrastructure
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-Evaluating lossless audio compression algorithms requires rigorous, multi-dimensional benchmarking. A common mistake in codec evaluation is measuring only a single metric—such as compression ratio—on a narrow or biased dataset (e.g., standard 16-bit stereo CD tracks).
+Evaluating lossless audio compression algorithms requires rigorous, multi-dimensional benchmarking. A common mistake in codec evaluation is measuring only a single metric (such as compression ratio) on a narrow or biased dataset (such as standard 16-bit stereo CD tracks).
 
 In modern multitrack production and archiving workflows, a codec must balance multiple competing objectives:
 1. **Compression Ratio ($CR$):** Minimizing storage footprint across diverse signal types (tonal, transient, noisy, synthetic, multitrack stems).

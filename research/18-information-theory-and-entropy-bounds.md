@@ -1,4 +1,4 @@
-# Research Paper 18: Information Theory & Entropy Bounds — Shannon Entropy, Conditional Entropy of Multitrack Stems, and Rate-Distortion Limits
+# Research Paper 18: Information Theory & Entropy Bounds: Shannon Entropy, Conditional Entropy of Multitrack Stems, and Rate-Distortion Limits
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-At the foundation of lossless compression is **Information Theory**, formulated by Claude Shannon in 1948. In lossless compression, the goal is reducing the average bit-length per sample to its theoretical lower bound—the **Entropy ($H$)** of the source—without dropping a single bit of information.
+At the foundation of lossless compression is **Information Theory**, formulated by Claude Shannon in 1948. In lossless compression, the goal is reducing the average bit-length per sample to its theoretical lower bound (the **Entropy $H$** of the source) without dropping a single bit of information.
 
 For single-track audio (e.g., standard stereo FLAC), the sample sequence is modeled as a 1D discrete random process. However, for multitrack DAW project sessions containing $M$ parallel audio stems, the channels are not independent.
 

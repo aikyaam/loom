@@ -227,12 +227,12 @@ At high compression levels, exhaustive search is slow. Pruning strategies:
 
 ## References
 
-1. RFC 9639 — FLAC Specification
+1. RFC 9639: FLAC Specification
 2. FLAC source: `src/libFLAC/stream_encoder.c` (compression levels, apodization, search)
-3. CUEtools.Flake — Double-precision autocorrelation, punchout_tukey
-4. Hydrogenaudio thread "New FLAC compression improvement" — IRLS, benchmarking
-5. "Optimized FPGA Implementation of Audio Compression Using LPC and Golomb Coding" (2025) — Exponential Golomb alternative
-6. encode.su thread "Encoding FLAC residuals (alternatives to Rice encoding)" — ANS/arithmetic coding discussion
-7. FLAC-dev mailing list — Double vs single precision autocorrelation debate
+3. CUEtools.Flake: Double-precision autocorrelation, punchout_tukey
+4. Hydrogenaudio thread "New FLAC compression improvement": IRLS, benchmarking
+5. "Optimized FPGA Implementation of Audio Compression Using LPC and Golomb Coding" (2025): Exponential Golomb alternative
+6. encode.su thread "Encoding FLAC residuals (alternatives to Rice encoding)": ANS/arithmetic coding discussion
+7. FLAC-dev mailing list: Double vs single precision autocorrelation debate
 
 ---

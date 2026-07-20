@@ -1,4 +1,4 @@
-# Research Paper 11: Multichannel Decorrelation Theory — Karhunen-Loève Transform (KLT), Directed Dependency Graphs, and Cross-Track Residual Coupling
+# Research Paper 11: Multichannel Decorrelation Theory: Karhunen-Loève Transform (KLT), Directed Dependency Graphs, and Cross-Track Residual Coupling
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,14 +8,14 @@
 
 ## 1. Problem Statement
 
-Modern audio recording sessions (DAW multi-track projects) consist of tens or hundreds of correlated stem tracks—such as multi-microphone drum setups (kick, snare, hi-hat, overheads, room mics), layered guitar takes, multi-mic classical ensembles, and backing vocal harmonies.
+Modern audio recording sessions (DAW multi-track projects) consist of tens or hundreds of correlated stem tracks (such as multi-microphone drum setups with kick, snare, hi-hat, overheads, and room mics; layered guitar takes; multi-mic classical ensembles; and backing vocal harmonies).
 
 Traditional audio codecs compress tracks independently or limit interchannel decorrelation to 2-channel stereo pairs (Mid/Side, Left/Side, Right/Side). Compressing 32 parallel stems individually results in severe spatial redundancy:
-1. **Acoustic Leakage:** Microphone bleed across drum/vocal tracks creates near-identical phase and frequency components across multiple files.
+1. **Acoustic Leakage:** Microphone bleed across drum and vocal tracks creates near-identical phase and frequency components across multiple files.
 2. **Shared Room Acoustics:** Reverb decay and ambient noise floors are identical across stems.
 3. **Session Timing & Transients:** Instrument attacks occur simultaneously across tracks.
 
-The core challenge of **Loom's Cross-Track Engine** is developing an $M$-channel decorrelation framework that maximizes total entropy reduction across $M$ tracks while enforcing **Strict $O(1)$ Independent Track Extraction**—ensuring that a user reading a single stem from a 64-track `.loom` session container does not need to decode the remaining 63 tracks.
+The core challenge of **Loom's Cross-Track Engine** is developing an $M$-channel decorrelation framework that maximizes total entropy reduction across $M$ tracks while enforcing **Strict $O(1)$ Independent Track Extraction**, ensuring that a user reading a single stem from a 64-track `.loom` session container does not need to decode the remaining 63 tracks.
 
 ---
 

@@ -1,4 +1,4 @@
-# Research Paper 04: Linear Prediction Analysis — Burg's Method, Levinson-Durbin Recursion, and Lattice Filters
+# Research Paper 04: Linear Prediction Analysis: Burg's Method, Levinson-Durbin Recursion, and Lattice Filters
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -10,9 +10,9 @@
 
 In lossless audio compression, linear prediction reduces the dynamic range and variance of audio signals by subtracting a linear combination of previous samples $\hat{x}[n] = \sum_{i=1}^{p} a_i x[n-i]$ from the target sample $x[n]$. The resulting residual sequence $e[n] = x[n] - \hat{x}[n]$ exhibits a probability density function concentrated near zero, which can be encoded at significantly lower bitrates using entropy coding techniques (such as Golomb-Rice coding).
 
-The fundamental challenge in adaptive Linear Predictive Coding (LPC) is estimating the optimal coefficient vector $\mathbf{a} = [a_1, a_2, \dots, a_p]^T$ for a frame of $N$ audio samples. Traditional implementations rely on the **Autocorrelation Method** solved via the **Levinson-Durbin Recursion**. However, windowing artifacts (e.g., spectral leakage introduced by Hann/Tukey windows) and numerical instability in high-order models ($p > 12$) often lead to sub-optimal prediction residuals or unstable synthesis filters ($|k_i| \ge 1$).
+The fundamental challenge in adaptive Linear Predictive Coding (LPC) is estimating the optimal coefficient vector $\mathbf{a} = [a_1, a_2, \dots, a_p]^T$ for a frame of $N$ audio samples. Traditional implementations rely on the **Autocorrelation Method** solved via the **Levinson-Durbin Recursion**. However, windowing artifacts (such as spectral leakage introduced by Hann or Tukey windows) and numerical instability in high-order models ($p > 12$) often lead to sub-optimal prediction residuals or unstable synthesis filters ($|k_i| \ge 1$).
 
-This paper investigates alternative linear prediction algorithms—specifically **Burg's Maximum Entropy Method (MEM)**, the **Covariance Method**, and **Lattice Synthesis Filters**—evaluating their mathematical foundations, stability guarantees, computational complexity, and applicability to Loom's Rust-based compression engine.
+This paper investigates alternative linear prediction algorithms, specifically **Burg's Maximum Entropy Method (MEM)**, the **Covariance Method**, and **Lattice Synthesis Filters**, evaluating their mathematical foundations, stability guarantees, computational complexity, and applicability to Loom's Rust-based compression engine.
 
 ---
 

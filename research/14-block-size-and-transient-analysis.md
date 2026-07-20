@@ -1,4 +1,4 @@
-# Research Paper 14: Dynamic Block Size Selection & Transient Analysis — Short-Time Energy Variance, Spectral Flux, and Frame Boundary Optimization
+# Research Paper 14: Dynamic Block Size Selection & Transient Analysis: Short-Time Energy Variance, Spectral Flux, and Frame Boundary Optimization
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
@@ -8,7 +8,7 @@
 
 ## 1. Problem Statement
 
-Audio signals are non-stationary time-series: their statistical properties (pitch, harmonics, transient attacks, silence) change continuously over time. A core parameter in audio compression is the **Block Size ($N$)**—the number of audio samples processed in a single frame.
+Audio signals are non-stationary time-series: their statistical properties (pitch, harmonics, transient attacks, silence) change continuously over time. A core parameter in audio compression is the **Block Size ($N$)**, defined as the number of audio samples processed in a single frame.
 
 - **Large Block Sizes ($N = 4096 \dots 16384$):** Highly effective for stationary, harmonic audio (e.g., sustained string notes, organ tones) because linear prediction can capture fine-grained pitch periodicity and header overhead per sample is minimized.
 - **Small Block Sizes ($N = 192 \dots 512$):** Essential for non-stationary transient events (e.g., drum hits, castanets, vocal plosives). A large block containing a transient causes **pre-echo and post-echo energy spreading**, forcing high residual bit allocations across the entire block.
