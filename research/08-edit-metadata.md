@@ -1,4 +1,8 @@
-# Research Note 06: Edit Metadata Layer
+# Research Paper 06: Edit Metadata Layer
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: Apple/Pixar OpenTimelineIO (OTIO) specification, Audacity AUP3 project format.
 

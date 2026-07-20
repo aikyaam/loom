@@ -1,4 +1,8 @@
-# Research Note 03: Adaptive LPC via Levinson-Durbin
+# Research Paper 03: Adaptive LPC via Levinson-Durbin
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: [RFC 9639 §4.3](https://www.rfc-editor.org/rfc/rfc9639.html#name-prediction), [Old FLAC Format](https://xiph.org/flac/old_format.html#prediction), Levinson (1947), Durbin (1960)
 

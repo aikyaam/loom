@@ -1,4 +1,8 @@
-# Research Note 08: Version Diffing
+# Research Paper 08: Version Diffing
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: RFC 3284 (VCDIFF) specification, `bsdiff` algorithm, git packfile delta compression.
 

@@ -1,4 +1,8 @@
-# Research Note 07: Time-Range Random Access
+# Research Paper 07: Time-Range Random Access
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: FLAC SEEKTABLE metadata spec, Matroska (MKV) cue points indexing.
 

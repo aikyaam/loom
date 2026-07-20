@@ -1,4 +1,8 @@
-# Research Note 05: Cross-Track Prediction
+# Research Paper 05: Cross-Track Prediction
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: WavPack multichannel decorrelation documentation, FLAC interchannel decorrelation concepts.
 

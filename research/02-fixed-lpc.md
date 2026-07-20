@@ -1,4 +1,8 @@
-# Research Note 02: Fixed Linear Prediction
+# Research Paper 02: Fixed Linear Prediction
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: [RFC 9639 §4.3](https://www.rfc-editor.org/rfc/rfc9639.html#name-prediction), [Old FLAC Format](https://xiph.org/flac/old_format.html#prediction), Shorten paper (Robinson, 1994)
 

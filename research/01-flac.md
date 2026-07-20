@@ -1,4 +1,8 @@
-# Research Note 01: FLAC Format Overview
+# Research Paper 01: FLAC Format Overview
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Source**: [RFC 9639](https://www.rfc-editor.org/rfc/rfc9639.html) (primary), [Old FLAC Format Spec](https://xiph.org/flac/old_format.html)
 

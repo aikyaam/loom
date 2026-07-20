@@ -1,4 +1,8 @@
-# Research Note 04: Stereo Decorrelation
+# Research Paper 04: Stereo Decorrelation
+
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
 
 **Sources**: [RFC 9639 §4.2](https://www.rfc-editor.org/rfc/rfc9639.html#name-interchannel-decorrelation), [Old FLAC Format](https://xiph.org/flac/old_format.html#interchannel)
 
