@@ -35,13 +35,17 @@ Audio container evolution spans four distinct paradigms over forty years:
 Let $M$ denote the number of stems, $N_{\text{frames}}$ the number of frames per stem, $H_{\text{session}}$ the unified session header byte length, and $H_{\text{single}}$ the per-file header byte length in single-track containers.
 
 In single-track storage (e.g., $M$ separate FLAC files):
+
 $$\text{Header}_{\text{indep}} = M \cdot H_{\text{single}} + M \cdot N_{\text{frames}} \cdot S_{\text{index}}$$
+
 where $S_{\text{index}}$ is the seek point tuple byte size.
 
 In Loom's session container (`.loom`):
+
 $$\text{Header}_{\text{Loom}} = H_{\text{session}} + \sum_{m=1}^{M} H_{\text{track-meta}, m} + N_{\text{frames}} \cdot S_{\text{seek-unified}}$$
 
 Because $H_{\text{session}}$ consolidates common properties (global sample rate, bit depth, artist metadata, edit overlay lists, session version trees), the container overhead reduction ratio $R_{\text{overhead}}$ scales linearly with the number of stems $M$:
+
 $$R_{\text{overhead}} = 1 - \frac{\text{Header}_{\text{Loom}}}{\text{Header}_{\text{indep}}} \approx 1 - \frac{1}{M}$$
 
 For a 64-track DAW project, Loom reduces metadata container overhead by over $95\%$.

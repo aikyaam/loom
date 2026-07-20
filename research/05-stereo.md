@@ -26,35 +26,51 @@ FLAC defines four stereo channel assignment modes, chosen per frame:
 Let $L[n]$ be the Left channel sample, and $R[n]$ be the Right channel sample at sample index $n$.
 
 ### 1. Mid/Side (MS)
+
 $$\text{Mid}[n] = \lfloor \frac{L[n] + R[n]}{2} \rfloor$$
+
 $$\text{Side}[n] = L[n] - R[n]$$
 
 **Reconstruction**:
+
 $$L[n] = \text{Mid}[n] + \lfloor \frac{\text{Side}[n] + 1}{2} \rfloor$$
+
 $$R[n] = \text{Mid}[n] - \lfloor \frac{\text{Side}[n]}{2} \rfloor$$
 
 *Proof of exact reconstruction:*
 Let's verify:
 If we substitute $\text{Mid}$ and $\text{Side}$:
+
 $$\text{Side} \text{ is odd} \implies \text{Side} = 2k+1 \implies L - R = 2k+1 \implies L + R = 2\text{Mid} + 1$$
+
 If $L - R$ is odd, $L + R$ is also odd (since $L-R$ and $L+R$ have the same parity).
+
 $$\text{Mid} = \lfloor \frac{L+R}{2} \rfloor = \frac{L+R-1}{2}$$
+
 $$L = \text{Mid} + \lfloor \frac{2k+1+1}{2} \rfloor = \text{Mid} + k + 1 = \frac{L+R-1}{2} + \frac{L-R-1}{2} + 1 = L$$
+
 $$R = \text{Mid} - \lfloor \frac{2k+1}{2} \rfloor = \text{Mid} - k = \frac{L+R-1}{2} - \frac{L-R-1}{2} = R$$
+
 Works exactly, preventing roundoff error!
 
 ### 2. Left/Side (LS)
+
 $$\text{Left}[n] = L[n]$$
+
 $$\text{Side}[n] = L[n] - R[n]$$
 
 **Reconstruction**:
+
 $$R[n] = L[n] - \text{Side}[n]$$
 
 ### 3. Right/Side (RS)
+
 $$\text{Right}[n] = R[n]$$
+
 $$\text{Side}[n] = L[n] - R[n]$$
 
 **Reconstruction**:
+
 $$L[n] = R[n] + \text{Side}[n]$$
 
 ---
@@ -74,7 +90,9 @@ Decorrelation can increase the dynamic range of the side channel:
 
 The encoder evaluates all 4 stereo modes for every block by checking the sum of absolute values or estimated entropy of the decorrelated samples. The mode with the smallest total estimated size is selected.
 Estimate formula for channel $c$:
+
 $$\text{cost}(c) = \sum_n |x_c[n]|$$
+
 Total cost is $\text{cost}(ch1) + \text{cost}(ch2)$ adjusted for bit-depth expansion.
 
 ---

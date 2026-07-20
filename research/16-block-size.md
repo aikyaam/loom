@@ -35,19 +35,25 @@ Loom evaluates three complementary transient detection metrics over sub-windows 
 
 #### 1. Short-Time Energy Variance (STEV)
 The short-time energy $E[k]$ for sub-window $k$ is given by:
+
 $$E[k] = \sum_{n=k \cdot M}^{(k+1)M - 1} x^2[n]$$
 
 The short-time energy ratio $R_E[k]$ between adjacent sub-windows is:
+
 $$R_E[k] = \frac{E[k] + \epsilon}{E[k-1] + \epsilon}$$
+
 A transient attack is flagged if $R_E[k] > \Theta_{\text{energy}}$ (typically $\Theta_{\text{energy}} = 8.0$, corresponding to a $+9\text{ dB}$ energy spike).
 
 #### 2. Spectral Flux (Delta S)
 Spectral flux measures the rate of local spectral change between consecutive sub-window spectra $X_k(\omega)$ derived via a 128-point Fast Fourier Transform:
+
 $$\Delta S[k] = \sum_{\omega} H\left( |X_k(\omega)| - |X_{k-1}(\omega)| \right)$$
+
 where $H(x) = \frac{x + |x|}{2}$ is the Half-Wave Rectifier function (considering only energy increases).
 
 #### 3. High-Frequency Content Ratio (HFCR)
 Transient attacks contain high-frequency noise bursts. The HFCR metric calculates the ratio of high-band energy to total energy:
+
 $$\text{HFCR}[k] = \frac{\sum_{\omega = \pi/2}^{\pi} |X_k(\omega)|^2}{\sum_{\omega = 0}^{\pi} |X_k(\omega)|^2}$$
 
 ---

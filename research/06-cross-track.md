@@ -25,22 +25,30 @@ Let $E_A[n]$ be the residual of track $A$ after per-track prediction (LPC or Fix
 Let $E_B[n]$ be the residual of track $B$ after per-track prediction.
 
 We can model the correlation between $E_A$ and $E_B$ using a first-order cross-track predictor:
+
 $$\hat{E}_B[n] = w \cdot E_A[n]$$
+
 where $w$ is a quantized coupling weight. The new cross-track residual for $B$ is:
+
 $$e_B[n] = E_B[n] - \text{round}(w \cdot E_A[n])$$
 
 If $w$ is chosen correctly, the variance of $e_B$ is much smaller than $E_B$.
 
 ### Weight Estimation
 The optimal weight $w$ can be computed using least-squares correlation:
+
 $$w = \frac{\sum_n E_A[n] \cdot E_B[n]}{\sum_n E_A[n]^2}$$
 
 We quantize $w$ to a fixed-point integer (e.g., $Q4.12$ or simple 8-bit quantization) so that the decoder can reconstruct the signal exactly using integer arithmetic. Let $W_q$ be the integer weight:
+
 $$W_q = \text{round}(w \cdot 256) \implies w \approx \frac{W_q}{256}$$
+
 $$\hat{E}_B[n] = (W_q \cdot E_A[n]) \gg 8$$
+
 $$e_B[n] = E_B[n] - \hat{E}_B[n]$$
 
 ### Reconstruction
+
 $$E_B[n] = e_B[n] + ((W_q \cdot E_A[n]) \gg 8)$$
 
 ---

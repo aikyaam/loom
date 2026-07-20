@@ -33,8 +33,11 @@ This paper evaluates **Reversible Integer MDCT (IntMDCT)**, **Integer Wavelet Tr
 ### 3.1 Standard MDCT Formulation
 
 For a frame of $2N$ samples $x[n]$, the MDCT produces $N$ frequency coefficients $X[k]$:
+
 $$X[k] = \sum_{n=0}^{2N-1} h[n] x[n] \cos\left[ \frac{\pi}{N} \left( n + \frac{1}{2} + \frac{N}{2} \right) \left( k + \frac{1}{2} \right) \right], \quad k = 0, 1, \dots, N-1$$
+
 where $h[n]$ is a smooth window function (e.g., Sine or Kaiser-Bessel Derived window) satisfying the Princen-Bradley condition:
+
 $$h^2[n] + h^2[n+N] = 1$$
 
 Because the matrix multiplication uses real-valued floats, direct inverse transformation $\mathbf{x} = \text{IMDCT}(\mathbf{X})$ yields small rounding errors ($\approx 10^{-7}$), making standard MDCT inherently lossy.
@@ -59,6 +62,7 @@ x_1'' &= x_1' + \lfloor a \cdot x_2' \rceil
 \end{aligned}$$
 
 **Exact Inverse Operation (Reconstruction):**
+
 $$\begin{aligned}
 x_1' &= x_1'' - \lfloor a \cdot x_2' \rceil \\
 x_2 &= x_2' - \lfloor b \cdot x_1' \rceil \\

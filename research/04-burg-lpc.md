@@ -36,17 +36,23 @@ During the late 1970s and 1980s, LPC became the dominant paradigm in speech comp
 ### 3.1 The Autoregressive (AR) Model
 
 An autoregressive process of order $p$, denoted $\text{AR}(p)$, models a discrete-time signal $x[n]$ as:
+
 $$x[n] = -\sum_{i=1}^{p} a_i x[n-i] + e[n]$$
+
 where $e[n]$ is a zero-mean white noise excitation process with variance $\sigma_e^2$, and $a_i$ are the predictor coefficients.
 
 The transfer function of the synthesis filter $H(z)$ is given by:
+
 $$H(z) = \frac{1}{A(z)} = \frac{1}{1 + \sum_{i=1}^{p} a_i z^{-i}}$$
 
 ### 3.2 Yule-Walker Equations (Autocorrelation Method)
 
 Multiplying both sides of the AR equation by $x[n-k]$ and taking the expected value yields the Yule-Walker equations:
+
 $$R_{xx}[k] + \sum_{i=1}^{p} a_i R_{xx}[k-i] = 0, \quad k = 1, 2, \dots, p$$
+
 where $R_{xx}[k] = E\{x[n]x[n-k]\}$ is the autocorrelation function. In matrix form:
+
 $$\begin{bmatrix}
 R[0] & R[1] & \dots & R[p-1] \\
 R[1] & R[0] & \dots & R[p-2] \\
@@ -74,16 +80,21 @@ where $k_m$ represents the $m$-th **reflection coefficient** (or PARCOR coeffici
 ### 3.3 Burg's Algorithm Formulation
 
 Burg's method avoids computing the autocorrelation matrix explicitly and does not apply windowing. It defines the forward prediction error $f_m[n]$ and backward prediction error $b_m[n]$ for an order $m$ predictor at sample index $n$:
+
 $$f_m[n] = f_{m-1}[n] + k_m b_{m-1}[n-1]$$
+
 $$b_m[n] = b_{m-1}[n-1] + k_m f_{m-1}[n]$$
 
 Base cases ($m=0$):
+
 $$f_0[n] = b_0[n] = x[n], \quad n = 0, 1, \dots, N-1$$
 
 Burg calculates the reflection coefficient $k_m$ by minimizing the sum of forward and backward residual energies for order $m$:
+
 $$\mathcal{E}_m = \sum_{n=m}^{N-1} \left( f_m^2[n] + b_m^2[n] \right)$$
 
 Differentiating $\mathcal{E}_m$ with respect to $k_m$ and setting $\frac{\partial \mathcal{E}_m}{\partial k_m} = 0$ yields:
+
 $$k_m = -\frac{2 \sum_{n=m}^{N-1} f_{m-1}[n] b_{m-1}[n-1]}{\sum_{n=m}^{N-1} \left( f_{m-1}^2[n] + b_{m-1}^2[n-1] \right)}$$
 
 ---
@@ -153,7 +164,9 @@ Burg's algorithm maintains two workspace vectors for forward and backward predic
 
 **Memory Footprint:**
 - Stack allocation for $N = 4096$ with `f64` precision:
+
   $$\text{Memory} = 2 \times 4096 \times 8 \text{ bytes} + 32 \times 8 \text{ bytes} \approx 65.5 \text{ KB}$$
+
 - For multitrack encoding with $M$ parallel channels (e.g., $M = 32$ stems), memory buffers can be pre-allocated per thread worker, avoiding dynamic heap allocation during the encoding loop.
 
 ---
@@ -176,7 +189,9 @@ Loom will implement a **Dual-Engine Predictor Search**:
 1. **Engine A (Fast Mode / Levinson-Durbin):** Computes Hann-windowed autocorrelation and Levinson-Durbin coefficients. If the resulting reflection coefficients satisfy $|k_i| < 0.999$, the model is evaluated.
 2. **Engine B (High-Efficiency Mode / Burg MEM):** Runs Burg's algorithm directly on unwindowed PCM. Guaranteed to produce $|k_i| < 1.0$.
 3. **Entropy Comparison:** Computes the bit-cost estimate for both methods:
+
    $$\text{Cost} = \sum_{i=p}^{N-1} \text{RiceBits}(e[i], k_{\text{opt}}) + p \cdot \text{qlp-precision}$$
+
    The engine selects whichever predictor yields the smaller bit representation.
 
 ---

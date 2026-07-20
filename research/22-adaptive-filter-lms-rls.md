@@ -32,22 +32,31 @@ Lossless audio codecs such as Shorten (Robinson 1994) and FLAC (Coalson 2000) re
 ### 3.1 Normalized Least Mean Squares (NLMS)
 
 Let $\mathbf{x}[n] = [x[n-1], x[n-2], \dots, x[n-p]]^T$ denote the vector of $p$ previous audio samples. The predicted sample $\hat{x}[n]$ and prediction error $e[n]$ are given by:
+
 $$\hat{x}[n] = \mathbf{w}^T[n] \mathbf{x}[n]$$
+
 $$e[n] = x[n] - \hat{x}[n]$$
 
 The coefficient vector $\mathbf{w}[n]$ is updated at each sample using the normalized step size $\mu$:
+
 $$\mathbf{w}[n+1] = \mathbf{w}[n] + \frac{\mu}{\varepsilon + \|\mathbf{x}[n]\|^2} e[n] \mathbf{x}[n]$$
+
 where $\varepsilon > 0$ prevents division by zero in silent audio regions.
 
 ### 3.2 Recursive Least Squares (RLS)
 
 RLS minimizes the exponentially weighted cost function:
+
 $$\mathcal{E}[n] = \sum_{i=1}^{n} \lambda^{n-i} \left( x[i] - \mathbf{w}^T[n] \mathbf{x}[i] \right)^2$$
+
 where $\lambda \in (0, 1]$ is the forgetting factor.
 
 The exact RLS gain vector $\mathbf{k}[n]$ and inverse correlation matrix $\mathbf{P}[n] = \mathbf{\Phi}^{-1}[n]$ update equations are:
+
 $$\mathbf{k}[n] = \frac{\lambda^{-1} \mathbf{P}[n-1] \mathbf{x}[n]}{1 + \lambda^{-1} \mathbf{x}^T[n] \mathbf{P}[n-1] \mathbf{x}[n]}$$
+
 $$\mathbf{w}[n] = \mathbf{w}[n-1] + \mathbf{k}[n] e[n]$$
+
 $$\mathbf{P}[n] = \lambda^{-1} \mathbf{P}[n-1] - \lambda^{-1} \mathbf{k}[n] \mathbf{x}^T[n] \mathbf{P}[n-1]$$
 
 ---

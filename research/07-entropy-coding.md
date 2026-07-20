@@ -12,6 +12,7 @@
 In lossless audio compression, once linear prediction (fixed or adaptive LPC) subtracts redundancy from PCM sample sequences, the remaining prediction error (residual) $e[n]$ has a zero-mean, symmetrical, peaked probability distribution. 
 
 Entropy coding compresses these residuals to their theoretical limit established by Shannon's source coding theorem:
+
 $$H(E) = -\sum_{i} P(e_i) \log_2 P(e_i) \quad \text{bits/sample}$$
 
 The primary challenge is selecting an entropy coding scheme that maximizes compression ratio (approaching entropy $H(E)$) while achieving real-time decoding throughput (100+ MB/s per core) and maintaining bitstream specification compatibility.
@@ -36,20 +37,25 @@ This paper evaluates **Golomb-Rice Coding**, **Huffman Coding**, **Range Coding*
 ### 3.1 Probability Modeling of Audio Residuals
 
 Audio prediction residuals $e[n]$ are accurately modeled by a zero-mean **Laplacian Distribution** (or Two-Sided Geometric Distribution):
+
 $$f(e) = \frac{1}{2b} \exp\left( -\frac{|e|}{b} \right)$$
+
 where $b = \frac{E\{|e|\}}{\sqrt{2}}$ is the scale parameter.
 
 Discrete integer probability $P(e)$ for integer residual $e \in \mathbb{Z}$:
+
 $$P(e) = \frac{1 - p}{1 + p} p^{|e|}, \quad \text{where } p = e^{-1/b}$$
 
 ### 3.2 Signed to Unsigned Mapping (Zigzag / Interleaving)
 
 Because Rice and ANS codecs operate on non-negative integers $u \in \mathbb{N}_0$, signed residual values $e \in \mathbb{Z}$ are mapped bijectionally:
+
 $$u = \text{fold}(e) = \begin{cases} 
 2e & \text{if } e \ge 0 \\
 -2e - 1 & \text{if } e < 0 
 \end{cases}$$
 Unfolding (decoding):
+
 $$e = \text{unfold}(u) = \begin{cases}
 u / 2 & \text{if } u \text{ is even} \\
 -(u + 1) / 2 & \text{if } u \text{ is odd}
@@ -79,6 +85,7 @@ pub fn unfold(u: u64) -> i64 {
 For a partition of $N$ folded samples $u_0, u_1, \dots, u_{N-1}$ with mean value $\mu = \frac{1}{N} \sum_{i=0}^{N-1} u_i$:
 
 The optimal Rice parameter $k \in \mathbb{N}_0$ (where divisor $M = 2^k$) satisfies:
+
 $$k = \max\left(0, \left\lceil \log_2 \left( \frac{\ln 2}{1 + \mu/N} \cdot \mu \right) \right\rceil \right) \approx \max\left(0, \left\lfloor \log_2(\mu) + 0.05 \right\rfloor \right)$$
 
 In Golomb-Rice coding, sample $u$ is split into:
@@ -89,6 +96,7 @@ The quotient $q$ is stored as $q$ zero bits followed by a stop bit `1` (unary co
 The remainder $r$ is stored as $k$ bits in raw binary.
 
 Total bit length for sample $u$:
+
 $$L(u) = (u \gg k) + 1 + k \quad \text{bits}$$
 
 ---
@@ -124,13 +132,18 @@ While Rice coding uses fixed unary-plus-binary code words, **rANS** (range Asymm
 
 **rANS Encoding Step:**  
 Given symbol $s$ with frequency $f_s$ and cumulative frequency $C_s = \sum_{i < s} f_i$ in an alphabet of size $M$:
+
 $$x_{\text{next}} = \left( \lfloor x / f_s \rfloor \ll m \right) + C_s + (x \bmod f_s)$$
+
 Bits are emitted to the stream whenever $x$ exceeds $2L-1$.
 
 **rANS Decoding Step:**  
 From state $x$, the cumulative slot is retrieved:
+
 $$\text{slot} = x \bmod 2^m$$
+
 Symbol $s$ is looked up in an inverse table. State is updated:
+
 $$x_{\text{next}} = f_s \cdot \lfloor x \gg m \rfloor + \text{slot} - C_s$$
 
 ---
@@ -157,7 +170,9 @@ Let $N$ be the partition block size (e.g., $N = 512$ or $N = 4096$).
 ### 6.2 tANS (Table ANS)
 - **State Requirement:** Pre-computed lookup tables.
 - Table size for table size $L = 2^{11} = 2048$ entries:
+
   $$\text{Decode Table Size} = 2048 \times 4 \text{ bytes} = 8 \text{ KB per table}$$
+
 - Fits comfortably inside L1 Data Cache ($32\text{ KB}$ per core), ensuring zero L2/L3 cache misses during decoding.
 
 ---

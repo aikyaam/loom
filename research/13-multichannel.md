@@ -36,10 +36,13 @@ The core challenge of **Loom's Cross-Track Engine** is developing an $M$-channel
 Let $\mathbf{x}[n] = [x_1[n], x_2[n], \dots, x_M[n]]^T$ be an $M$-dimensional vector of audio samples across $M$ tracks at sample index $n$.
 
 The spatial covariance matrix $\mathbf{\Sigma}_{xx} \in \mathbb{R}^{M \times M}$ is defined as:
+
 $$\mathbf{\Sigma}_{xx} = E\{ \mathbf{x}[n] \mathbf{x}^T[n] \} \approx \frac{1}{N} \sum_{n=0}^{N-1} \mathbf{x}[n] \mathbf{x}^T[n]$$
 
 The **Karhunen-Loève Transform (KLT)** diagonalizes $\mathbf{\Sigma}_{xx}$ via its eigenvector decomposition:
+
 $$\mathbf{\Sigma}_{xx} = \mathbf{V} \mathbf{\Lambda} \mathbf{V}^T$$
+
 where $\mathbf{V}$ is an orthogonal matrix of eigenvectors, and $\mathbf{\Lambda} = \text{diag}(\lambda_1, \lambda_2, \dots, \lambda_M)$ contains eigenvalues representing variance along principal axes.
 
 While KLT theoretically achieves optimal energy compaction, it suffers from two major flaws for lossless session compression:
@@ -56,18 +59,23 @@ Let $E_t[n]$ be the LPC prediction residual of track $t$ ($t \in \{0, 1, \dots, 
 Let Track 0 be designated as the **Primary Reference Track** (e.g., standard stereo mix or main drum track).
 
 For target track $t > 0$, we model its residual $E_t[n]$ as a linear function of reference residual $E_0[n]$:
+
 $$\hat{E}_t[n] = \frac{W_t}{256} \cdot E_0[n]$$
+
 where $W_t \in [-128, 127]$ is an 8-bit signed quantized coupling weight.
 
 The cross-track residual $e_t[n]$ is computed as:
+
 $$e_t[n] = E_t[n] - \left( \frac{W_t \cdot E_0[n]}{256} \right)$$
 
 ### 3.3 Optimal Coupling Weight Calculation
 
 To minimize the residual energy $\sum_n e_t^2[n]$, we take the derivative with respect to $W_t$:
+
 $$\frac{\partial}{\partial W_t} \sum_{n=0}^{N-1} \left( E_t[n] - \frac{W_t}{256} E_0[n] \right)^2 = 0$$
 
 Solving for $W_t$:
+
 $$W_t = \text{round}\left( 256 \cdot \frac{\sum_{n=0}^{N-1} E_t[n] E_0[n]}{\sum_{n=0}^{N-1} E_0^2[n]} \right)$$
 
 ### 3.4 Bit-Cost Thresholding & Graph Optimization
@@ -137,7 +145,9 @@ Let $M$ be the number of tracks (e.g., $M = 32$) and $N$ be the frame block size
 ## 6. Memory Analysis
 
 - **Encoder Buffer Workspace:**
+
   $$\text{Memory} = M \times N \times 8 \text{ bytes} = 32 \times 4096 \times 8 = 1.048 \text{ MB}$$
+
   Fits easily within CPU L3 cache ($16-64 \text{ MB}$).
 
 - **Decoder Workstation Memory:**

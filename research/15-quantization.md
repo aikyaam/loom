@@ -39,15 +39,19 @@ Let $Q$ be the desired quantization precision (bits per coefficient, $5 \le Q \l
 Let $a_{\max} = \max_{i} |a_i|$ be the maximum absolute coefficient value in the frame.
 
 To maximize bit utilization within the available $Q$-bit range without overflow, we compute an integer shift factor $S \in \mathbb{Z}$:
+
 $$S = \left\lceil \log_2(a_{\max}) \right\rceil + Q - b_{\text{target}}$$
+
 where $b_{\text{target}} = Q - 1$ represents the available magnitude range excluding the sign bit.
 
 The quantized integer coefficients $q_i \in \mathbb{Z}$ are computed as:
+
 $$q_i = \text{round}\left( a_i \cdot 2^{S} \right) = \left\lfloor a_i \cdot 2^{S} + 0.5 \right\rfloor$$
 
 ### 3.2 Dynamic Range & Overflow Bound Analysis
 
 During frame decoding, the predicted sample $\hat{x}[n]$ is calculated as:
+
 $$\hat{x}[n] = \left( \sum_{i=1}^{p} q_i \cdot x[n-i] \right) \gg S$$
 
 Let $B$ be the input audio sample bit depth (e.g., $B = 24$ bits for 24-bit audio).  
@@ -55,13 +59,16 @@ The sample magnitude is bounded by $|x[n]| \le 2^{B-1}$.
 The quantized coefficient magnitude is bounded by $|q_i| \le 2^{Q-1}$.
 
 The maximum possible absolute sum in the accumulator before shifting is:
+
 $$|\text{Acc}_{\max}| = \sum_{i=1}^{p} |q_i| \cdot |x[n-i]| \le p \cdot (2^{Q-1}) \cdot (2^{B-1}) = p \cdot 2^{B + Q - 2}$$
 
 **Required Bit-Width Calculation:**  
 To prevent integer overflow, the accumulator bit-width $W_{\text{acc}}$ must satisfy:
+
 $$W_{\text{acc}} \ge \log_2(p) + B + Q - 1$$
 
 For worst-case studio parameters ($P = 32$ order, $B = 24$ bit depth, $Q = 15$ coefficient precision):
+
 $$W_{\text{acc}} \ge \log_2(32) + 24 + 15 - 1 = 5 + 24 + 15 - 1 = 43 \text{ bits}$$
 
 Since $43 \text{ bits} < 64 \text{ bits}$, performing MAC accumulation using **signed 64-bit integers (`i64`)** guarantees **zero risk of integer overflow** across all legal FLAC/Loom parameter combinations!
@@ -100,6 +107,7 @@ Since $43 \text{ bits} < 64 \text{ bits}$, performing MAC accumulation using **s
 In Rust and C99, right-shifting a negative signed integer (`acc >> S`) performs **arithmetic right shift** (sign-extending the top bits). Arithmetic right shift rounds toward $-\infty$ (floor rounding), whereas integer division (`acc / 2^S`) rounds toward zero (truncation).
 
 FLAC and Loom bitstreams strictly mandate **arithmetic right shift** (floor division):
+
 $$\text{acc} \gg S = \left\lfloor \frac{\text{acc}}{2^S} \right\rfloor$$
 
 This ensures that the predicted sample calculation is single-instruction on x86 (`sar`) and ARM (`asr`), eliminating conditional branches in the decoding loop.
@@ -123,7 +131,9 @@ Let $N$ be the frame block size ($N = 4096$) and $P$ be the LPC order ($P = 16$)
 - **Coefficient Storage Overhead:**
   Quantized coefficients require $P \times Q$ bits per frame header.
   For order $P = 12$ and precision $Q = 12$:
+
   $$\text{Storage} = 12 \times 12 = 144 \text{ bits} = 18 \text{ bytes}$$
+
 - **Execution Memory:**
   Zero dynamic heap allocations. Execution requires a single 64-bit register for `acc`.
 

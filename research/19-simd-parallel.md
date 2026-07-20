@@ -10,6 +10,7 @@
 ## 1. Problem Statement
 
 High-bitrate, multi-channel audio projects (such as 64 stems recorded at 24-bit / 96kHz) generate immense uncompressed data throughput:
+
 $$\text{Throughput} = 64 \text{ tracks} \times 96,000 \text{ samples/sec} \times 3 \text{ bytes/sample} \approx 18.43 \text{ MB/sec}$$
 
 For real-time DAW operations (such as live bounce-to-disk or multi-track playhead scrubbing across 64 tracks), a lossless codec must execute encoding and decoding at **over $100\times$ real-time speed** ($> 1.8 \text{ GB/sec}$).
@@ -37,12 +38,14 @@ This paper details **Loom's Parallel Codec Architecture**, evaluating SIMD vecto
 ### 3.1 SIMD Vectorization of Autocorrelation
 
 The autocorrelation function $R[k]$ for lag $k \in [0, P]$ over block size $N$:
+
 $$R[k] = \sum_{n=0}^{N-1-k} x[n] \cdot x[n+k]$$
 
 #### 256-Bit AVX2 Vectorization (4-Way `f64` / 4-Way `i64`)
 An AVX2 register `__m256d` holds four 64-bit floating-point values $[v_0, v_1, v_2, v_3]$.
 
 For lag $k$, the dot product is unrolled into 4 parallel accumulators:
+
 $$\mathbf{Acc}_0 = \sum_{n=0, 4, 8 \dots} \mathbf{x}[n..n+3] \odot \mathbf{x}[n+k..n+k+3]$$
 
 The total number of loop iterations is reduced from $N$ to $\lceil N / 4 \rceil$, achieving a theoretical **$4\times$ speedup per core**.
@@ -53,12 +56,15 @@ Let $P_{\text{parallel}}$ be the fraction of total codec execution time that can
 Let $S_{\text{serial}} = 1 - P_{\text{parallel}}$ be the serial fraction (file header writing, seek index aggregation).
 
 By Amdahl's Law, the maximum speedup $S(N_{\text{cores}})$ on $N_{\text{cores}}$ is:
+
 $$S(N_{\text{cores}}) = \frac{1}{(1 - P_{\text{parallel}}) + \frac{P_{\text{parallel}}}{N_{\text{cores}}}}$$
 
 In Loom's session container architecture, because each audio track $t \in [0, M-1]$ can be encoded independently in parallel:
+
 $$P_{\text{parallel}} \ge 0.985 \quad (98.5\% \text{ parallelizable})$$
 
 On a 16-core CPU ($N_{\text{cores}} = 16$):
+
 $$S(16) = \frac{1}{0.015 + \frac{0.985}{16}} = \frac{1}{0.015 + 0.0615} \approx 13.07\times \text{ Speedup}$$
 
 ---

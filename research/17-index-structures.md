@@ -33,7 +33,9 @@ This paper evaluates **FLAC Seek Table Blocks**, **Multitrack Secondary Indices*
 ### 3.1 Seek Point Structure
 
 A seek point $P_i$ is an 18-byte tuple:
+
 $$P_i = (S_i, O_i, N_i)$$
+
 where:
 - $S_i \in \mathbb{N}_0$ is the target sample number (64-bit unsigned integer).
 - $O_i \in \mathbb{N}_0$ is the byte offset relative to the start of the first audio frame (64-bit unsigned integer).
@@ -44,18 +46,22 @@ where:
 Given a target sample $S_{\text{target}}$ and an array of $K$ sorted seek points $P_0, P_1, \dots, P_{K-1}$ (where $S_0 < S_1 < \dots < S_{K-1}$):
 
 The index finding function $\text{SeekIndex}(S_{\text{target}})$ locates index $i$ such that:
+
 $$S_i \le S_{\text{target}} < S_{i+1}$$
 
 Using binary search over the $K$ seek points:
+
 $$\text{Search Steps} = \lceil \log_2 K \rceil$$
 
 For a 2-hour audio session with seek points placed every 1 second ($K = 7200$ seek points):
+
 $$\text{Search Steps} = \lceil \log_2 7200 \rceil = 13 \text{ comparisons}$$
 
 Once index $i$ is located:
 1. The bitstream reader jumps directly to byte offset $O_i$.
 2. The decoder reads frame $P_i$ and decodes $N_i$ samples.
 3. The exact target sample $S_{\text{target}}$ is extracted by skipping the intra-frame sample offset:
+
    $$\Delta_{\text{skip}} = S_{\text{target}} - S_i$$
 
 ---
@@ -105,9 +111,13 @@ Let $K$ be the number of seek points in the table, $N$ be the frame block size (
 - **Seek Table Memory Footprint:**
   Each seek point occupies 18 bytes.
   For a 1-hour stereo session with 1-second seek point intervals ($K = 3600$ points):
+
   $$\text{Memory} = 3600 \times 18 \text{ bytes} = 64.8 \text{ KB}$$
+
 - For a 32-track session with independent seek tables per track:
+
   $$\text{Memory} = 32 \times 64.8 \text{ KB} = 2.07 \text{ MB}$$
+
   Fits inside standard application RAM without impacting DAW performance.
 
 ---

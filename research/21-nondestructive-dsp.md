@@ -44,15 +44,19 @@ Let $t \in [0, 1]$ be normalized progress: $t = \frac{n - n_{\text{start}}}{N_{\
 Loom supports four mathematical fade shapes $g(t) \in [0.0, 1.0]$:
 
 #### 1. Linear Fade Curve
+
 $$g_{\text{linear}}(t) = \begin{cases} t & \text{Fade-In} \\ 1 - t & \text{Fade-Out} \end{cases}$$
 
 #### 2. Logarithmic / Exponential Fade Curve (Equal Power)
+
 $$g_{\text{exponential}}(t) = \begin{cases} t^2 & \text{Fade-In} \\ (1 - t)^2 & \text{Fade-Out} \end{cases}$$
 
 #### 3. S-Curve / Sigmoidal Fade Curve (Smooth Step)
+
 $$g_{\text{scurve}}(t) = \begin{cases} 3t^2 - 2t^3 & \text{Fade-In} \\ 1 - (3t^2 - 2t^3) & \text{Fade-Out} \end{cases}$$
 
 #### 4. Cosine / Equal Energy Fade Curve
+
 $$g_{\text{cosine}}(t) = \begin{cases} \sin\left(\frac{\pi}{2} t\right) & \text{Fade-In} \\ \cos\left(\frac{\pi}{2} t\right) & \text{Fade-Out} \end{cases}$$
 
 ---
@@ -62,13 +66,16 @@ $$g_{\text{cosine}}(t) = \begin{cases} \sin\left(\frac{\pi}{2} t\right) & \text{
 Gain envelope points $(n_k, G_k)$ define piecewise linear volume automation, where $G_k \in \mathbb{R}$ is the linear gain multiplier ($G = 10^{\text{dB}/20}$).
 
 For sample $n \in [n_k, n_{k+1}]$:
+
 $$G(n) = G_k + (G_{k+1} - G_k) \cdot \frac{n - n_k}{n_{k+1} - n_k}$$
 
 The edited output sample $y[n]$ is computed as:
+
 $$y[n] = \text{round}\left( x[n] \cdot g(t) \cdot G(n) \right)$$
 
 ### 3.3 Mute Region Masking
 For sample $n \in [n_{\text{mute-start}}, n_{\text{mute-end}}]$:
+
 $$y[n] = 0$$
 
 ---
@@ -123,7 +130,9 @@ Let $N_{\text{block}} = 4096$ be the decoded block size, and $E$ be the number o
 
 - **EditBlock Metadata Memory Footprint:**
   An edit block with 10 mutes, 10 fades, and 50 gain points:
+
   $$\text{Memory} = 10 \times 16 + 10 \times 18 + 50 \times 12 \approx 940 \text{ bytes}$$
+
 - Occupies less than $1 \text{ KB}$ inside the `.loom` container application header.
 
 ---

@@ -35,12 +35,15 @@ The fundamental theoretical questions Loom addresses are:
 Let $X$ be a discrete random variable representing PCM audio samples with alphabet $\mathcal{X} = \{-2^{b-1}, \dots, 2^{b-1}-1\}$ for $b$-bit audio.
 
 The first-order Shannon Entropy $H(X)$ is:
+
 $$H(X) = -\sum_{x \in \mathcal{X}} P(x) \log_2 P(x) \quad \text{bits/sample}$$
 
 If samples are correlated (which is true for audio), the $k$-th order block entropy $H_k(X)$ or memory-conditional entropy $H(X_n | X_{n-1}, \dots, X_{n-p})$ provides a much tighter lower bound:
+
 $$H(X_n | X_{n-1}, \dots, X_{n-p}) = H(X_n, X_{n-1}, \dots, X_{n-p}) - H(X_{n-1}, \dots, X_{n-p})$$
 
 Linear prediction models the conditional expectation $E\{X_n | X_{n-1}, \dots, X_{n-p}\}$, converting memory-conditional entropy into first-order residual entropy $H(E)$:
+
 $$H(X_n | X_{n-1}, \dots, X_{n-p}) \approx H(E) = -\sum_{e} P(e) \log_2 P(e)$$
 
 ---
@@ -48,18 +51,22 @@ $$H(X_n | X_{n-1}, \dots, X_{n-p}) \approx H(E) = -\sum_{e} P(e) \log_2 P(e)$$
 ### 3.2 Multitrack Joint Entropy & Mutual Information
 
 For a multitrack session with $M$ stems $X_1, X_2, \dots, X_M$, compressing each track independently yields total bits governed by the sum of individual entropies:
+
 $$\text{Bits}_{\text{independent}} = N \sum_{i=1}^M H(X_i)$$
 
 However, the true theoretical lower bound for the entire session is the **Joint Entropy** $H(X_1, X_2, \dots, X_M)$:
+
 $$H(X_1, X_2, \dots, X_M) = \sum_{i=1}^M H(X_i | X_1, X_2, \dots, X_{i-1})$$
 
 The difference between independent compression and joint compression is equal to the **Total Mutual Information** $I(X_1; X_2; \dots; X_M)$:
+
 $$I(X_1; X_2; \dots; X_M) = \sum_{i=1}^M H(X_i) - H(X_1, X_2, \dots, X_M) \ge 0$$
 
 ### 3.3 Loom Cross-Track Bounds
 
 Loom's cross-track predictor estimates the conditional residual $e_t = E_t - w \cdot E_0$.  
 The residual entropy reduction achieved by cross-track coupling equals the mutual information between residuals $I(E_t; E_0)$:
+
 $$\Delta H_t = H(E_t) - H(e_t) = I(E_t; E_0) = H(E_t) + H(E_0) - H(E_t, E_0)$$
 
 If $I(E_t; E_0) > 0$, cross-track prediction strictly reduces the bitstream entropy, bringing multitrack session compression closer to the joint entropy bound $H(X_1, \dots, X_M)$.
@@ -112,7 +119,9 @@ If $I(E_t; E_0) > 0$, cross-track prediction strictly reduces the bitstream entr
 
 - **Probability Histogram Memory:** 
   Computing first-order entropy $H(E)$ on 16-bit residuals requires a frequency table of $2^{16} = 65,536$ bins:
+
   $$\text{Memory} = 65536 \times 4 \text{ bytes} = 256 \text{ KB}$$
+
   Fits inside CPU L2 cache for instant calculation.
 
 ---
@@ -163,7 +172,9 @@ For 16-bit signed audio residuals, a fixed array `[u32; 65536]` is used instead 
 ## 10. Benchmark Methodology
 
 ### 10.1 Shannon Efficiency Ratio (Eta_Shannon)
+
 $$\eta_{\text{Shannon}} = \frac{H(E)}{\text{Bits Per Sample Encoded}} \times 100\%$$
+
 Measures how close Loom's Rice/ANS encoder gets to theoretical entropy limits.
 
 ---

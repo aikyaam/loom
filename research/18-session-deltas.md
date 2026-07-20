@@ -36,9 +36,11 @@ Let $F_i^{(v1)}$ be the $i$-th compressed frame of Track $t$ in Version 1.
 Let $F_j^{(v2)}$ be the $j$-th compressed frame of Track $t$ in Version 2.
 
 Each frame byte array $F \in \mathbb{U}^{L}$ (where $L$ is the compressed frame length in bytes) is fingerprinted using MD5:
+
 $$H(F) = \text{MD5}(F) \in \mathbb{U}^{16}$$
 
 Two frames $F_A$ and $F_B$ are declared bit-identical if:
+
 $$H(F_A) == H(F_B) \implies F_A = F_B \quad (\text{Probability of Collision } P_{\text{collision}} < 10^{-38})$$
 
 ---
@@ -65,6 +67,7 @@ $$\text{Size of Version 2 (Full File)} \approx N_{\text{total}} \cdot L_{\text{a
 $$\text{Size of Delta File } \Delta(v_1 \to v_2) \approx (N_{\text{total}} - N_{\text{modified}}) \cdot 5 + N_{\text{modified}} \cdot (5 + L_{\text{avg}})$$
 
 For a session revision modifying $2\%$ of audio frames ($N_{\text{modified}} = 0.02 N_{\text{total}}$):
+
 $$\mathcal{R}_{\text{delta}} = \frac{\text{Delta Size}}{\text{Full Size}} \approx \frac{0.98 \times 5 + 0.02 \times (5 + L_{\text{avg}})}{L_{\text{avg}}} \approx 0.02 + \frac{5}{L_{\text{avg}}} \approx 2.3\%$$
 
 **Loom's Frame-Level Delta achieves a 97.7% reduction in storage size for 2% modified revisions!**
@@ -119,7 +122,9 @@ Let $F$ be the total frames per track, and $M$ be the number of tracks.
 ## 6. Memory Analysis
 
 - **MD5 Index Memory:** Storing MD5 fingerprints for a 10,000-frame multi-track session requires:
+
   $$\text{Memory} = 10000 \times 16 \text{ bytes} = 160 \text{ KB}$$
+
 - Extreme memory efficiency enables instant diff computation in background thread workers.
 
 ---
