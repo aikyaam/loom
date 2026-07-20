@@ -58,7 +58,7 @@ $$\text{Encoding Throughput} = \frac{S_{\text{raw}}}{10^6 \times T_{\text{enc}}}
 ### 3.4 Random Access Seek Latency ($\tau_{\text{seek}}$)
 
 For a target sample timestamp $t_{\text{target}}$:
-$$\tau_{\text{seek}} = T_{\text{index\_lookup}} + T_{\text{frame\_read}} + T_{\text{decode\_block}}$$
+$$\tau_{\text{seek}} = T_{\text{index\\_lookup}} + T_{\text{frame\\_read}} + T_{\text{decode\\_block}}$$
 
 ---
 

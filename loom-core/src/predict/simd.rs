@@ -1,5 +1,3 @@
-//! High-Performance SIMD Vectorization Routines (AVX2, SSE2, ARM NEON).
-
 #[allow(dead_code)]
 fn autocorr_scalar(data: &[f64], order: usize) -> Vec<f64> {
     let n = data.len();

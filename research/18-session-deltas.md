@@ -48,7 +48,7 @@ $$H(F_A) == H(F_B) \implies F_A = F_B \quad (\text{Probability of Collision } P_
 A session delta file $\Delta(v_1 \to v_2)$ represents Version 2 relative to Base Version 1 as a sequence of **Frame Instructions** per track:
 
 1. **`COPY { base_frame_idx: u32 }`**  
-   Instructs the reconstructor to copy frame $F_{\text{base\_frame\_idx}}^{(v1)}$ directly from Version 1.  
+   Instructs the reconstructor to copy frame $F_{\text{base\\_frame\\_idx}}^{(v1)}$ directly from Version 1.  
    **Instruction Size:** $1 \text{ byte (type tag)} + 4 \text{ bytes (index)} = 5 \text{ bytes}$.
 
 2. **`INSERT { frame_bytes: Vec<u8> }`**  
