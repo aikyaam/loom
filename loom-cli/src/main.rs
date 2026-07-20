@@ -105,6 +105,12 @@ enum Commands {
         file1: String,
         file2: String,
     },
+    Inspect {
+        input: String,
+    },
+    Info {
+        input: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -969,6 +975,57 @@ fn main() -> Result<()> {
                 println!("Bit-Exact PCM Check: MATCH (100% Identical Signal)");
             } else {
                 println!("Bit-Exact PCM Check: Audio Signals Differ");
+            }
+        }
+        Commands::Inspect { input } | Commands::Info { input } => {
+            println!("Inspecting Loom Container: {}", input);
+            let mut file = File::open(&input)?;
+            let mut data = Vec::new();
+            file.read_to_end(&mut data)?;
+
+            if data.starts_with(b"fLaC") {
+                let (tracks, header, edits, tags, picture) = decode_session_full(&data)
+                    .map_err(|e| anyhow!("Failed to parse container: {}", e))?;
+
+                println!("Stream Header:");
+                println!("  Magic: 'fLaC' (Loom Multitrack Session)");
+                println!("  Sample Rate: {} Hz", header.sample_rate);
+                println!("  Bit Depth: {} bits", header.bit_depth);
+                println!("  Stems Count: {}", header.tracks.len());
+
+                for (idx, trk) in header.tracks.iter().enumerate() {
+                    let md5_hex = trk.md5.iter().map(|b| format!("{:02x}", b)).collect::<String>();
+                    println!("    [{}] Track: '{}' | Samples: {} | MD5: {}", idx, trk.name, trk.total_samples, md5_hex);
+                }
+
+                if let Some(e) = edits {
+                    println!("Edit Overlays:");
+                    for (trk_idx, track_edits) in &e.tracks_edits {
+                        println!("    Track {}: {} mutes, {} fades, {} gain automation points",
+                                 trk_idx, track_edits.mutes.len(), track_edits.fades.len(), track_edits.gain_points.len());
+                    }
+                }
+
+                if let Some(t) = tags {
+                    println!("Metadata Tags:");
+                    for (k, v) in &t.tags {
+                        println!("    {} = {}", k, v);
+                    }
+                }
+
+                if let Some(p) = picture {
+                    println!("Cover Image:");
+                    println!("    MIME: {} | Size: {} bytes", p.mime_type, p.data.len());
+                }
+            } else {
+                let (decoded, header) = decode_track(&data)
+                    .map_err(|e| anyhow!("Failed to decode track: {}", e))?;
+                println!("Single-Track Header:");
+                println!("  Sample Rate: {} Hz", header.sample_rate);
+                println!("  Channels: {}", decoded.len());
+                if !decoded.is_empty() {
+                    println!("  Samples per channel: {}", decoded[0].len());
+                }
             }
         }
     }

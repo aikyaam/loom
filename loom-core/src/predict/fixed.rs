@@ -31,3 +31,19 @@ pub fn reconstruct_fixed(residuals: &[i64], samples: &mut [i64], order: usize) {
         samples[i] = residuals[i] + prediction;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_fixed_predictors_roundtrip() {
+        let samples: Vec<i64> = vec![10, 25, 42, 65, 90, 120, 155, 195];
+        for order in 0..=4 {
+            let res = compute_fixed_residuals(&samples, order);
+            let mut reconstructed = vec![0i64; samples.len()];
+            reconstruct_fixed(&res, &mut reconstructed, order);
+            assert_eq!(samples, reconstructed);
+        }
+    }
+}
