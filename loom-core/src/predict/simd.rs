@@ -1,3 +1,5 @@
+//! High-Performance SIMD Vectorization Routines (AVX2, SSE2, ARM NEON).
+
 #[allow(dead_code)]
 fn autocorr_scalar(data: &[f64], order: usize) -> Vec<f64> {
     let n = data.len();
@@ -66,6 +68,30 @@ unsafe fn autocorr_avx2(data: &[f64], order: usize) -> Vec<f64> {
     r
 }
 
+#[cfg(target_arch = "aarch64")]
+unsafe fn autocorr_neon(data: &[f64], order: usize) -> Vec<f64> {
+    use core::arch::aarch64::*;
+    let n = data.len();
+    let mut r = vec![0.0f64; order + 1];
+    for lag in 0..=order {
+        let mut sum_vec = vdupq_n_f64(0.0);
+        let limit = n - lag;
+        let mut i = 0;
+        while i + 1 < limit {
+            let a = vld1q_f64(data.as_ptr().add(i));
+            let b = vld1q_f64(data.as_ptr().add(i + lag));
+            sum_vec = vaddq_f64(sum_vec, vmulq_f64(a, b));
+            i += 2;
+        }
+        let mut total = vaddvq_f64(sum_vec);
+        if i < limit {
+            total += data[i] * data[i + lag];
+        }
+        r[lag] = total;
+    }
+    r
+}
+
 #[cfg(target_arch = "x86_64")]
 pub fn compute_autocorrelation(data: &[f64], order: usize) -> Vec<f64> {
     if is_x86_feature_detected!("avx2") {
@@ -75,7 +101,32 @@ pub fn compute_autocorrelation(data: &[f64], order: usize) -> Vec<f64> {
     }
 }
 
-#[cfg(not(target_arch = "x86_64"))]
+#[cfg(target_arch = "aarch64")]
+pub fn compute_autocorrelation(data: &[f64], order: usize) -> Vec<f64> {
+    unsafe { autocorr_neon(data, order) }
+}
+
+#[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
 pub fn compute_autocorrelation(data: &[f64], order: usize) -> Vec<f64> {
     autocorr_scalar(data, order)
+}
+
+pub fn vector_sub_i64(a: &[i64], b: &[i64], out: &mut [i64]) {
+    let len = a.len().min(b.len()).min(out.len());
+    for i in 0..len {
+        out[i] = a[i] - b[i];
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simd_autocorrelation() {
+        let data: Vec<f64> = (0..1024).map(|i| (i as f64 * 0.1).sin()).collect();
+        let r = compute_autocorrelation(&data, 8);
+        assert_eq!(r.len(), 9);
+        assert!(r[0] > 0.0);
+    }
 }

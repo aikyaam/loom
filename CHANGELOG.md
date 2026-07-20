@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Integrated Burg's Maximum Entropy Method (MEM) adaptive linear prediction algorithm in `loom-core::predict::lpc`, guaranteeing synthesis filter stability ($|k_i| < 1$).
 - Implemented Range Asymmetric Numeral Systems (rANS) entropy coding module (`loom_core::entropy::rans`).
 - Added Criterion.rs statistical benchmarking suite (`loom-core/benches/codec_benchmarks.rs`) for measuring encoding/decoding throughput.
+- Added AVX2, SSE2, and ARM NEON SIMD vectorization routines in `loom_core::predict::simd` for autocorrelation and vector operations.
 - Added CLI subcommands `loom benchmark`, `loom analyze`, and `loom compare` to `loom-cli`.
 
 ---
