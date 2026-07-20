@@ -1,8 +1,9 @@
-# Research Paper 15: Timeline Seeking & Random Access Index Structures: O(1) Seek Tables, Sample-Accurate Range Extraction, and Multitrack Indexing
+# Research Paper 17: Timeline Seeking & Random Access Index Structures: O(1) Seek Tables, Sample-Accurate Range Extraction, and Multitrack Indexing
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** [RFC 9639 §4.4](https://www.rfc-editor.org/rfc/rfc9639.html), Cormen et al. (2009)
 
 ---
 

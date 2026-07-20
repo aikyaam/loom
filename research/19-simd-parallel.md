@@ -1,8 +1,9 @@
-# Research Paper 17: High-Performance Codec Architecture: SIMD Vectorization (AVX2, AVX-512, NEON), Multi-Thread Parallelism, and Memory Locality
+# Research Paper 19: High-Performance Codec Architecture: SIMD Vectorization (AVX2, AVX-512, NEON), Multi-Thread Parallelism, and Memory Locality
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** Intel Optimization Manual (2023), ARM Neon Guide (2022), Rayon Framework
 
 ---
 

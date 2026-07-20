@@ -1,8 +1,9 @@
-# Research Paper 05: Entropy Coding Theory: Golomb-Rice Coding, Asymmetric Numeral Systems (ANS), and Range Coding for Lossless Audio Residuals
+# Research Paper 07: Entropy Coding Theory: Golomb-Rice Coding, Asymmetric Numeral Systems (ANS), and Range Coding for Lossless Audio Residuals
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** [RFC 9639 §4.5](https://www.rfc-editor.org/rfc/rfc9639.html), Rice (1979), Duda (2006, 2014), Martin (1979)
 
 ---
 

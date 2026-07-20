@@ -1,8 +1,9 @@
-# Research Paper 16: Version Control & Session Delta Compression: Frame-Level MD5 Fingerprinting, Content-Addressable Storage, and Session Reconstruction
+# Research Paper 18: Version Control & Session Delta Compression: Frame-Level MD5 Fingerprinting, Content-Addressable Storage, and Session Reconstruction
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** Tridgell (1999), MacDonald (2000), Percival (2003)
 
 ---
 

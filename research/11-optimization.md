@@ -1,8 +1,9 @@
-# 09-optimization-strategies.md
+# Research Paper 11: Compression Optimization Strategies for Lossless Audio Codecs
 
-## Compression Optimization Research for Loom
-
-This document summarizes optimization strategies from FLAC reference encoder, academic research, and community findings applicable to Loom's lossless audio codec.
+**Author:** Loom Codec Research Group  
+**Status:** Complete  
+**Date:** July 2026  
+**Sources:** [RFC 9639](https://www.rfc-editor.org/rfc/rfc9639.html), FLAC Reference Implementation (`stream_encoder.c`), CUEtools.Flake, Hydrogenaudio
 
 ---
 

@@ -1,8 +1,9 @@
-# Research Paper 13: Fixed-Point Arithmetic & Quantization Theory: Precision Loss, Dynamic Range, and Integer Operations in Lossless Audio Codecs
+# Research Paper 15: Fixed-Point Arithmetic & Quantization Theory: Precision Loss, Dynamic Range, and Integer Operations in Lossless Audio Codecs
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** [RFC 9639 §4.3](https://www.rfc-editor.org/rfc/rfc9639.html), Coalson (2000), Goldberg (1991)
 
 ---
 

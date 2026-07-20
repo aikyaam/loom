@@ -3,6 +3,7 @@
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** [RFC 9639 §4.3](https://www.rfc-editor.org/rfc/rfc9639.html), Burg (1967), Makhoul (1975), Levinson (1947), Durbin (1960)
 
 ---
 

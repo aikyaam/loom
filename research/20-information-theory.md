@@ -1,8 +1,9 @@
-# Research Paper 18: Information Theory & Entropy Bounds: Shannon Entropy, Conditional Entropy of Multitrack Stems, and Rate-Distortion Limits
+# Research Paper 20: Information Theory & Entropy Bounds: Shannon Entropy, Conditional Entropy of Multitrack Stems, and Rate-Distortion Limits
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** Shannon (1948), Cover & Thomas (2006), Den Brinker et al. (2009)
 
 ---
 

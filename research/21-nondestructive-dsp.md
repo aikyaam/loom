@@ -1,8 +1,9 @@
-# Research Paper 19: Non-Destructive Digital Signal Processing: Fade Curves, Gain Envelopes, Mute Masking, and O(1) Header-Only Session Editing
+# Research Paper 21: Non-Destructive Digital Signal Processing: Fade Curves, Gain Envelopes, Mute Masking, and O(1) Header-Only Session Editing
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** Rumsey & Timbers (2014), Pohlmann (2010)
 
 ---
 

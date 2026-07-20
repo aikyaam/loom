@@ -1,8 +1,9 @@
-# Research Paper 11: Multichannel Decorrelation Theory: Karhunen-Loève Transform (KLT), Directed Dependency Graphs, and Cross-Track Residual Coupling
+# Research Paper 13: Multichannel Decorrelation Theory: Karhunen-Loève Transform (KLT), Directed Dependency Graphs, and Cross-Track Residual Coupling
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** Openshaw (2002), Liebchen (2006), Gersho & Gray (1992)
 
 ---
 

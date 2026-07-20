@@ -1,8 +1,9 @@
-# Research Paper 10: Audio Transform Analysis: Reversible Integer Transforms (IntMDCT, Integer Wavelets) vs. Time-Domain Linear Prediction in Bit-Exact Lossless Compression
+# Research Paper 12: Audio Transform Analysis: Reversible Integer Transforms (IntMDCT, Integer Wavelets) vs. Time-Domain Linear Prediction in Bit-Exact Lossless Compression
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** Geiger et al. (2002), Sweldens (1996), ISO/IEC 14496-5 (MPEG-4 ALS), Princen & Bradley (1986)
 
 ---
 

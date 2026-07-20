@@ -1,8 +1,9 @@
-# Research Paper 12: Codec Evaluation Methodology: Comprehensive Benchmark Framework, Dataset Taxonomy, and Empirical Testing Infrastructure
+# Research Paper 14: Codec Evaluation Methodology: Comprehensive Benchmark Framework, Dataset Taxonomy, and Empirical Testing Infrastructure
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** EBU SQAM (1988), Criterion.rs Framework, Hydrogenaudio Lossless Benchmark Corpus
 
 ---
 

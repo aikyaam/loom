@@ -1,8 +1,9 @@
-# Research Paper 14: Dynamic Block Size Selection & Transient Analysis: Short-Time Energy Variance, Spectral Flux, and Frame Boundary Optimization
+# Research Paper 16: Dynamic Block Size Selection & Transient Analysis: Short-Time Energy Variance, Spectral Flux, and Frame Boundary Optimization
 
 **Author:** Loom Codec Research Group  
 **Status:** Complete  
 **Date:** July 2026  
+**Sources:** [RFC 9639 §4.1.3](https://www.rfc-editor.org/rfc/rfc9639.html), Valin et al. (2012), Bosi & Goldberg (2002)
 
 ---
 
