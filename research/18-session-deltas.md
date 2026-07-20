@@ -48,14 +48,14 @@ $$H(F_A) == H(F_B) \implies F_A = F_B \quad (\text{Probability of Collision } P_
 A session delta file $\Delta(v_1 \to v_2)$ represents Version 2 relative to Base Version 1 as a sequence of **Frame Instructions** per track:
 
 1. **`COPY { base_frame_idx: u32 }`**  
-   Instructs the reconstructor to copy frame $F_{\text{base\\_frame\\_idx}}^{(v1)}$ directly from Version 1.  
+   Instructs the reconstructor to copy frame $F_{\text{base\_frame\_idx}}^{(v1)}$ directly from Version 1.  
    **Instruction Size:** $1 \text{ byte (type tag)} + 4 \text{ bytes (index)} = 5 \text{ bytes}$.
 
 2. **`INSERT { frame_bytes: Vec<u8> }`**  
    Instructs the reconstructor to insert a new compressed frame present only in Version 2 (e.g., a newly recorded punch-in frame).  
    **Instruction Size:** $1 \text{ byte (type tag)} + 4 \text{ bytes (length)} + L \text{ bytes (frame data)}$.
 
-### 3.3 Theoretical Storage Reduction Ratio ($\mathcal{R}_{\text{delta}}$)
+### 3.3 Theoretical Storage Reduction Ratio (R_delta)
 
 Let $N_{\text{total}}$ be total frames in Version 2, and $N_{\text{modified}}$ be the number of modified/inserted frames.  
 Let $L_{\text{avg}}$ be the average compressed frame size in bytes (typically $1000-2000 \text{ bytes}$).

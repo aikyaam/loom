@@ -162,7 +162,7 @@ For 16-bit signed audio residuals, a fixed array `[u32; 65536]` is used instead 
 
 ## 10. Benchmark Methodology
 
-### 10.1 Shannon Efficiency Ratio ($\eta_{\text{Shannon}}$)
+### 10.1 Shannon Efficiency Ratio (Eta_Shannon)
 $$\eta_{\text{Shannon}} = \frac{H(E)}{\text{Bits Per Sample Encoded}} \times 100\%$$
 Measures how close Loom's Rice/ANS encoder gets to theoretical entropy limits.
 

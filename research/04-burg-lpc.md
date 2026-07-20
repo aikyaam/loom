@@ -176,7 +176,7 @@ Loom will implement a **Dual-Engine Predictor Search**:
 1. **Engine A (Fast Mode / Levinson-Durbin):** Computes Hann-windowed autocorrelation and Levinson-Durbin coefficients. If the resulting reflection coefficients satisfy $|k_i| < 0.999$, the model is evaluated.
 2. **Engine B (High-Efficiency Mode / Burg MEM):** Runs Burg's algorithm directly on unwindowed PCM. Guaranteed to produce $|k_i| < 1.0$.
 3. **Entropy Comparison:** Computes the bit-cost estimate for both methods:
-   $$\text{Cost} = \sum_{i=p}^{N-1} \text{RiceBits}(e[i], k_{\text{opt}}) + p \cdot \text{qlp\\_precision}$$
+   $$\text{Cost} = \sum_{i=p}^{N-1} \text{RiceBits}(e[i], k_{\text{opt}}) + p \cdot \text{qlp\_precision}$$
    The engine selects whichever predictor yields the smaller bit representation.
 
 ---

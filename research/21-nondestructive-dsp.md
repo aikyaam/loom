@@ -68,7 +68,7 @@ The edited output sample $y[n]$ is computed as:
 $$y[n] = \text{round}\left( x[n] \cdot g(t) \cdot G(n) \right)$$
 
 ### 3.3 Mute Region Masking
-For sample $n \in [n_{\text{mute\\_start}}, n_{\text{mute\\_end}}]$:
+For sample $n \in [n_{\text{mute\_start}}, n_{\text{mute\_end}}]$:
 $$y[n] = 0$$
 
 ---

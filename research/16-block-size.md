@@ -41,7 +41,7 @@ The short-time energy ratio $R_E[k]$ between adjacent sub-windows is:
 $$R_E[k] = \frac{E[k] + \epsilon}{E[k-1] + \epsilon}$$
 A transient attack is flagged if $R_E[k] > \Theta_{\text{energy}}$ (typically $\Theta_{\text{energy}} = 8.0$, corresponding to a $+9\text{ dB}$ energy spike).
 
-#### 2. Spectral Flux ($\Delta S$)
+#### 2. Spectral Flux (Delta S)
 Spectral flux measures the rate of local spectral change between consecutive sub-window spectra $X_k(\omega)$ derived via a 128-point Fast Fourier Transform:
 $$\Delta S[k] = \sum_{\omega} H\left( |X_k(\omega)| - |X_{k-1}(\omega)| \right)$$
 where $H(x) = \frac{x + |x|}{2}$ is the Half-Wave Rectifier function (considering only energy increases).

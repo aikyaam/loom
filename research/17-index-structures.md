@@ -39,7 +39,7 @@ where:
 - $O_i \in \mathbb{N}_0$ is the byte offset relative to the start of the first audio frame (64-bit unsigned integer).
 - $N_i \in \mathbb{N}_0$ is the number of samples contained in target frame $i$ (16-bit unsigned integer).
 
-### 3.2 Binary Search Seek Location Algorithm ($\mathcal{O}(\log K)$)
+### 3.2 Binary Search Seek Location Algorithm (O(log K))
 
 Given a target sample $S_{\text{target}}$ and an array of $K$ sorted seek points $P_0, P_1, \dots, P_{K-1}$ (where $S_0 < S_1 < \dots < S_{K-1}$):
 
