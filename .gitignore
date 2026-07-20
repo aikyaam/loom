@@ -6,3 +6,5 @@ temp/
 *.flac
 __pycache__/
 *.pyc
+plan.md
+system-research.md
