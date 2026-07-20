@@ -6,8 +6,8 @@ use crate::config::{CompressionLevel, RiceSearch};
 use crate::entropy::rice::{find_best_k_exhaustive, fold, rice_bits};
 use fixed::{compute_fixed_residuals, reconstruct_fixed};
 use lpc::{
-    compute_lpc_coefficients, compute_lpc_residuals, irls_refine, quantize_lpc_coefficients,
-    reconstruct_lpc,
+    compute_lpc_burg, compute_lpc_coefficients, compute_lpc_residuals, irls_refine,
+    quantize_lpc_coefficients, reconstruct_lpc,
 };
 
 #[derive(Clone, Debug)]
@@ -170,36 +170,44 @@ pub fn search_predictor(samples: &[i64], bps: usize, level: CompressionLevel) ->
         let mut best_order_total = u64::MAX;
         let mut best_order_residuals = None;
         let mut best_order_coeffs: Option<(Vec<i32>, i8, usize)> = None;
+        let mut candidate_coeff_sets = Vec::new();
         for &apod in &apodizations {
             if let Some(coeffs) = compute_lpc_coefficients(samples, order, apod) {
-                let refined = if use_irls {
-                    irls_refine(samples, &coeffs, order, irls_iters).unwrap_or(coeffs)
-                } else {
-                    coeffs
-                };
-                let precisions: Vec<usize> = if qlp_precision_search {
-                    vec![8, 10, 12, 15]
-                } else {
-                    vec![15]
-                };
-                for &qlp_precision in &precisions {
-                    let (qlp_coeffs, qlp_shift) =
-                        quantize_lpc_coefficients(&refined, qlp_precision);
-                    let residuals = compute_lpc_residuals(samples, &qlp_coeffs, qlp_shift, order);
-                    let overhead = (order * bps) as u64 + 4 + 5 + (order * qlp_precision) as u64;
-                    let (_, res_bits) = find_best_partition_order(
-                        &residuals,
-                        order,
-                        max_part_order,
-                        rice_search,
-                        bps,
-                    );
-                    let total_bits = overhead + res_bits;
-                    if total_bits < best_order_total {
-                        best_order_total = total_bits;
-                        best_order_residuals = Some(residuals);
-                        best_order_coeffs = Some((qlp_coeffs, qlp_shift, qlp_precision));
-                    }
+                candidate_coeff_sets.push(coeffs);
+            }
+        }
+        if let Some(burg_coeffs) = compute_lpc_burg(samples, order) {
+            candidate_coeff_sets.push(burg_coeffs);
+        }
+
+        for coeffs in candidate_coeff_sets {
+            let refined = if use_irls {
+                irls_refine(samples, &coeffs, order, irls_iters).unwrap_or(coeffs)
+            } else {
+                coeffs
+            };
+            let precisions: Vec<usize> = if qlp_precision_search {
+                vec![8, 10, 12, 15]
+            } else {
+                vec![15]
+            };
+            for &qlp_precision in &precisions {
+                let (qlp_coeffs, qlp_shift) =
+                    quantize_lpc_coefficients(&refined, qlp_precision);
+                let residuals = compute_lpc_residuals(samples, &qlp_coeffs, qlp_shift, order);
+                let overhead = (order * bps) as u64 + 4 + 5 + (order * qlp_precision) as u64;
+                let (_, res_bits) = find_best_partition_order(
+                    &residuals,
+                    order,
+                    max_part_order,
+                    rice_search,
+                    bps,
+                );
+                let total_bits = overhead + res_bits;
+                if total_bits < best_order_total {
+                    best_order_total = total_bits;
+                    best_order_residuals = Some(residuals);
+                    best_order_coeffs = Some((qlp_coeffs, qlp_shift, qlp_precision));
                 }
             }
         }

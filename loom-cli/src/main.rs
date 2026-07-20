@@ -4,7 +4,7 @@ use hound::{WavReader, WavSpec, WavWriter};
 use loom_core::config::EncoderConfig;
 use loom_core::container::header::SessionHeader;
 use loom_core::verify::{compute_pcm_md5, verify_stream};
-use loom_core::{decode_session, decode_track, encode_session_with_config, encode_track};
+use loom_core::{decode_session, decode_session_full, decode_track, encode_session_with_config, encode_track};
 use std::fs::{self, File};
 use std::io::{Cursor, Read, Write};
 use std::path::Path;
@@ -94,6 +94,16 @@ enum Commands {
 
         #[arg(long, value_name = "KEY=VALUE")]
         set: Vec<String>,
+    },
+    Benchmark {
+        input: String,
+    },
+    Analyze {
+        input: String,
+    },
+    Compare {
+        file1: String,
+        file2: String,
     },
 }
 
@@ -837,6 +847,128 @@ fn main() -> Result<()> {
                 let mut out_file = File::create(&input)?;
                 out_file.write_all(&updated)?;
                 println!("Tags updated successfully.");
+            }
+        }
+        Commands::Benchmark { input } => {
+            println!("Running Loom Codec Benchmark on {}...", input);
+            let input_path = Path::new(&input);
+            let (channels, sample_rate, bit_depth) = read_audio_file(input_path)
+                .map_err(|e| anyhow!("Failed to read input audio file: {}", e))?;
+
+            if channels.is_empty() {
+                return Err(anyhow!("No audio channels decoded"));
+            }
+
+            let total_samples = channels[0].len();
+            let uncompressed_bytes = total_samples * channels.len() * (bit_depth as usize / 8);
+            let duration_sec = total_samples as f64 / sample_rate as f64;
+
+            println!("Input Spec: {} channels, {} Hz, {}-bit, {:.2} sec audio ({:.2} MB uncompressed)",
+                     channels.len(), sample_rate, bit_depth, duration_sec, uncompressed_bytes as f64 / 1_048_576.0);
+            println!("{:<8} {:<14} {:<14} {:<14} {:<12}", "Level", "Compress Time", "Decompress Time", "Comp Ratio", "Throughput");
+            println!("{:-<65}", "");
+
+            let track_names = vec!["benchmark_stem".to_string()];
+            let session_data = vec![channels.clone()];
+
+            for &level in &[1u8, 5u8, 8u8] {
+                let config = EncoderConfig::new(level, 4096, sample_rate, bit_depth);
+
+                let start_enc = std::time::Instant::now();
+                let compressed = encode_session_with_config(&session_data, &track_names, &config, None, None, None)
+                    .map_err(|e| anyhow!("Benchmark encode failed: {}", e))?;
+                let enc_dur = start_enc.elapsed();
+
+                let start_dec = std::time::Instant::now();
+                let (decoded_tracks, _) = decode_session(&compressed)
+                    .map_err(|e| anyhow!("Benchmark decode failed: {}", e))?;
+                let dec_dur = start_dec.elapsed();
+
+                let ratio = (compressed.len() as f64 / uncompressed_bytes as f64) * 100.0;
+                let mb_per_sec = (uncompressed_bytes as f64 / 1_048_576.0) / enc_dur.as_secs_f64();
+
+                assert_eq!(decoded_tracks.len(), 1);
+                println!("Level {:<2} {:<14.2?} {:<14.2?} {:<13.2}% {:<10.2} MB/s",
+                         level, enc_dur, dec_dur, ratio, mb_per_sec);
+            }
+        }
+        Commands::Analyze { input } => {
+            println!("Analyzing Loom container {}...", input);
+            let mut file = File::open(&input)?;
+            let mut data = Vec::new();
+            file.read_to_end(&mut data)?;
+
+            if data.starts_with(b"fLaC") {
+                let (tracks, header, edits, tags, _picture) = decode_session_full(&data)
+                    .map_err(|e| anyhow!("Failed to parse session header: {}", e))?;
+
+                println!("Session Overview:");
+                println!("  Magic: fLaC (Loom Session)");
+                println!("  Sample Rate: {} Hz", header.sample_rate);
+                println!("  Bit Depth: {} bits", header.bit_depth);
+                println!("  Tracks Count: {}", header.tracks.len());
+
+                for (idx, trk) in header.tracks.iter().enumerate() {
+                    let pcm_len = if idx < tracks.len() && !tracks[idx].is_empty() {
+                        tracks[idx][0].len()
+                    } else {
+                        0
+                    };
+                    println!("  Track {}: '{}' ({} total samples, {} pcm decoded)", idx, trk.name, trk.total_samples, pcm_len);
+                }
+
+                if let Some(e) = edits {
+                    println!("  Edit Overlays: Active ({} track edit entries)", e.tracks_edits.len());
+                } else {
+                    println!("  Edit Overlays: None");
+                }
+
+                if let Some(t) = tags {
+                    println!("  Metadata Tags: {} entries", t.tags.len());
+                }
+            } else {
+                let (decoded, header) = decode_track(&data)
+                    .map_err(|e| anyhow!("Failed to decode track: {}", e))?;
+                let samples = decoded.first().map(|ch| ch.len()).unwrap_or(0);
+                println!("Single-Track Overview:");
+                println!("  Magic: Custom Single Track");
+                println!("  Sample Rate: {} Hz", header.sample_rate);
+                println!("  Channels: {}", decoded.len());
+                println!("  Samples: {}", samples);
+            }
+            println!("Analysis complete.");
+        }
+        Commands::Compare { file1, file2 } => {
+            println!("Comparing {} vs {}...", file1, file2);
+            let p1 = Path::new(&file1);
+            let p2 = Path::new(&file2);
+
+            let (ch1, sr1, bd1) = read_audio_file(p1)
+                .map_err(|e| anyhow!("Failed to read file 1: {}", e))?;
+            let (ch2, sr2, bd2) = read_audio_file(p2)
+                .map_err(|e| anyhow!("Failed to read file 2: {}", e))?;
+
+            let len1 = fs::metadata(p1)?.len();
+            let len2 = fs::metadata(p2)?.len();
+
+            let flat1: Vec<i64> = ch1.concat();
+            let flat2: Vec<i64> = ch2.concat();
+
+            let md5_1 = compute_pcm_md5(&flat1, bd1);
+            let md5_2 = compute_pcm_md5(&flat2, bd2);
+
+            println!("File 1 Size: {} bytes ({})", len1, file1);
+            println!("File 2 Size: {} bytes ({})", len2, file2);
+            println!("Specs: File 1 ({}Hz, {}ch, {}bit) vs File 2 ({}Hz, {}ch, {}bit)", sr1, ch1.len(), bd1, sr2, ch2.len(), bd2);
+
+            let diff_bytes = (len2 as f64 - len1 as f64).abs();
+            let saved_pct = (diff_bytes / len1.max(len2) as f64) * 100.0;
+            println!("Size Difference: {:.2}%", saved_pct);
+
+            if md5_1 == md5_2 {
+                println!("Bit-Exact PCM Check: MATCH (100% Identical Signal)");
+            } else {
+                println!("Bit-Exact PCM Check: Audio Signals Differ");
             }
         }
     }

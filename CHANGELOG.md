@@ -6,13 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [Unreleased] - Phase 2: Codec Research & Performance Engineering
+## [0.3.0] - 2026-07-20 - Phase 2: Codec Research & Performance Engineering
 
-### Planned
-- High-order Burg Maximum Entropy Method (MEM) adaptive linear prediction engine integration.
-- Interleaved 4-way rANS entropy coder option for custom `.loom` multitrack payload streams.
-- AVX2 and ARM NEON SIMD vectorization of autocorrelation dot-products and residual MAC operations.
-- Criterion.rs statistical benchmark suite for tracking CPU throughput and compression ratio regressions.
+### Added
+- Integrated Burg's Maximum Entropy Method (MEM) adaptive linear prediction algorithm in `loom-core::predict::lpc`, guaranteeing synthesis filter stability ($|k_i| < 1$).
+- Implemented Range Asymmetric Numeral Systems (rANS) entropy coding module (`loom_core::entropy::rans`).
+- Added Criterion.rs statistical benchmarking suite (`loom-core/benches/codec_benchmarks.rs`) for measuring encoding/decoding throughput.
+- Added CLI subcommands `loom benchmark`, `loom analyze`, and `loom compare` to `loom-cli`.
 
 ---
 

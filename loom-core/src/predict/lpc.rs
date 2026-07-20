@@ -285,3 +285,67 @@ pub fn irls_refine(
     }
     Some(current)
 }
+
+pub fn compute_lpc_burg(samples: &[i64], order: usize) -> Option<Vec<f64>> {
+    let n = samples.len();
+    if n <= order || order == 0 {
+        return None;
+    }
+
+    let mut f: Vec<f64> = samples.iter().map(|&x| x as f64).collect();
+    let mut b: Vec<f64> = f.clone();
+    let mut a = vec![0.0f64; order + 1];
+
+    for m in 1..=order {
+        let mut num = 0.0f64;
+        let mut den = 0.0f64;
+        for i in m..n {
+            num += f[i] * b[i - 1];
+            den += f[i] * f[i] + b[i - 1] * b[i - 1];
+        }
+
+        if den == 0.0 {
+            return None;
+        }
+
+        let k = -2.0 * num / den;
+        if k.abs() >= 1.0 {
+            return None;
+        }
+
+        let mut a_next = vec![0.0f64; order + 1];
+        for j in 1..m {
+            a_next[j] = a[j] + k * a[m - j];
+        }
+        a_next[m] = k;
+        a.copy_from_slice(&a_next);
+
+        for i in (m..n).rev() {
+            let f_val = f[i];
+            let b_val = b[i - 1];
+            f[i] = f_val + k * b_val;
+            b[i] = b_val + k * f_val;
+        }
+    }
+
+    let coeffs: Vec<f64> = a[1..=order].iter().map(|&x| -x).collect();
+    Some(coeffs)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_burg_lpc_stability() {
+        let n = 512;
+        let samples: Vec<i64> = (0..n)
+            .map(|i| ((i as f64 * 0.05).sin() * 10000.0) as i64)
+            .collect();
+        let coeffs = compute_lpc_burg(&samples, 8).expect("Burg LPC failed");
+        assert_eq!(coeffs.len(), 8);
+        for &c in &coeffs {
+            assert!(c.is_finite());
+        }
+    }
+}

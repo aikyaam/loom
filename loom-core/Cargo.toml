@@ -19,3 +19,8 @@ rayon = "1.8"
 [dev-dependencies]
 # For generating test audio
 hound = "3.5"
+criterion = "0.5"
+
+[[bench]]
+name = "codec_benchmarks"
+harness = false
