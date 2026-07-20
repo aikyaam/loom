@@ -218,3 +218,24 @@ impl EncoderConfig {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_compression_level_mapping() {
+        for lvl in 0..=8 {
+            let cl = CompressionLevel::from_int(lvl);
+            assert_eq!(cl.to_int(), lvl);
+        }
+    }
+
+    #[test]
+    fn test_encoder_config_creation() {
+        let cfg = EncoderConfig::default_with_level(5, 44100, 16);
+        assert_eq!(cfg.block_size, 4096);
+        assert_eq!(cfg.sample_rate, 44100);
+        assert_eq!(cfg.bit_depth, 16);
+    }
+}
