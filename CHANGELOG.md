@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [0.4.0] - 2026-07-20 - Phase 4 & Phase 5: Cross-Track Decorrelation, Signal Transforms, & Production System Release
+## [0.4.0] - 2026-07-20 - Phase 3, Phase 4 & Phase 5: Session Container Architecture, Cross-Track Decorrelation, & Production System Release
 
 ### Added
 - Implemented Reversible 5/3 CDF Integer Wavelet Lifting Transform (`loom_core::transform::wavelet`) for multi-resolution residual decomposition.
@@ -20,18 +20,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [0.3.0] - 2026-07-20 - Phase 2 & Phase 3: Research Platform, Burg LPC, rANS, SIMD Acceleration, & Session Container Architecture
+## [0.3.0] - 2026-07-20 - Phase 2: Codec Research & Performance Engineering
 
 ### Added
-- Integrated Burg's Maximum Entropy Method (MEM) adaptive linear prediction algorithm (`loom_core::predict::lpc`), guaranteeing synthesis filter stability ($|k_i| < 1$).
+- Integrated Burg's Maximum Entropy Method (MEM) adaptive linear prediction algorithm in `loom-core::predict::lpc`, guaranteeing synthesis filter stability ($|k_i| < 1$).
 - Implemented Range Asymmetric Numeral Systems (rANS) entropy coding module (`loom_core::entropy::rans`).
 - Added ARM NEON (`autocorr_neon`) and x86_64 AVX2/SSE2 SIMD vectorization primitives in `loom_core::predict::simd`.
-- Added Criterion.rs statistical benchmarking suite (`loom-core/benches/codec_benchmarks.rs`, `loom-bench/benches/codec_bench.rs`) for measuring throughput and memory bandwidth.
+- Added Criterion.rs statistical benchmarking suite (`loom-core/benches/codec_benchmarks.rs`, `loom-bench/benches/codec_bench.rs`) for measuring encoding/decoding throughput.
 - Added CLI subcommands `loom benchmark`, `loom analyze`, and `loom compare` to `loom-cli`.
 
 ---
 
-## [0.2.0] - 2026-07-20 - Theoretical Research Manuscripts Completion
+## [0.2.0] - 2026-07-20 - Research Phase Completion
 
 ### Added
 - Authored 24 publication-grade academic research papers in `research/` covering digital signal processing, information theory, predictor mathematics, and session container design:
