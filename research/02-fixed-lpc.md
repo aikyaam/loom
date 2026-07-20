@@ -85,3 +85,10 @@ fn predict_fixed(samples: &[i64], n: usize, order: usize) -> i64 {
     }
 }
 ```
+
+---
+
+## References
+
+1. **RFC 9639 (2024):** *FLAC Audio Coding Format.* Section 4.3.2: Fixed Predictors. [https://www.rfc-editor.org/rfc/rfc9639.html#name-fixed-prediction](https://www.rfc-editor.org/rfc/rfc9639.html#name-fixed-prediction)
+2. **Robinson, T. (1994):** *SHORTEN: Simple Lossless and Near-Lossless Audio Compression.* Technical Report CUED/F-INFENG/TR.156, Cambridge University Engineering Department.

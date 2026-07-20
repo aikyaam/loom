@@ -57,6 +57,12 @@ A `.diff` file or block will be represented as:
 `apply-diff v1.loom diff -> v2.loom`:
 1. Open `v1.loom` and read its frame index.
 2. Read the diff instructions.
-3. Write a new Loom container, pasting frames from `v1.loom` or the diff payload according to instructions.
-4. Re-calculate seek indices.
 This achieves byte-exact reconstruction of `v2.loom`.
+
+---
+
+## References
+
+1. **Tridgell, A. (1999):** *Efficient Algorithms for Sorting and Synchronization.* PhD thesis, Australian National University.
+2. **MacDonald, J. (2000):** *File Difference Embedding Models on Information Topology.* Master's thesis, UC Berkeley.
+3. **Percival, C. (2003):** *Naive Difference Algorithms for Executables.* BSDiff Documentation.

@@ -112,10 +112,13 @@ SUBFRAME_LPC:
 
 ---
 
-## Implementation Notes for Loom
-
-1. Autocorrelation + windowing: use f64 arithmetic.
-2. Levinson-Durbin: use f64, check stability (|k_i| ≥ 1 → fallback).
-3. Quantization: convert to i64 coefficients and store precision + shift.
 4. Decoder: pure integer arithmetic (no floats needed at decode time).
 5. Order search: try orders 2, 4, 6, 8, 10, 12 (even orders tend to be better for audio) and the fixed predictors; pick smallest estimated bitcount.
+
+---
+
+## References
+
+1. **RFC 9639 (2024):** *FLAC Audio Coding Format.* Section 4.3.3: Linear Predictive Coding (LPC). [https://www.rfc-editor.org/rfc/rfc9639.html#name-linear-predictive-coding-lp](https://www.rfc-editor.org/rfc/rfc9639.html#name-linear-predictive-coding-lp)
+2. **Levinson, N. (1947):** *The Wiener (RMS) Error Criterion in Filter Design and Prediction.* Journal of Mathematics and Physics, Vol. 25, pp. 261-278.
+3. **Durbin, J. (1960):** *The Fitting of Time-Series Models.* Revue de l'Institut International de Statistique, pp. 233-244.

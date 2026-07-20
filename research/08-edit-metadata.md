@@ -97,9 +97,16 @@ pub fn apply_edits(
             gain *= edits.get_envelope_gain(track_id, current_sample);
         }
 
-        // Apply to PCM (clamping to range)
         *sample = (*sample as f32 * gain).round() as i32;
     }
 }
+```
+
+---
+
+## References
+
+1. **Rumsey, F., Timbers, P. (2014):** *Digital Audio Workstations: Principles and Practice.* Focal Press.
+2. **Pohlmann, K. C. (2010):** *Principles of Digital Audio.* McGraw-Hill Education, 6th Edition.
 ```
 Since this is applied on-the-fly, no audio re-encoding occurs!

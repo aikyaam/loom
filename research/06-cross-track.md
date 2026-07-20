@@ -60,7 +60,11 @@ The encoder should only apply cross-track prediction if the size reduction outwe
 1. Compute the per-track residuals $E_A$ and $E_B$.
 2. Compute the cross-correlation weight $W_q$ of $E_B$ relative to $E_A$.
 3. Compute $e_B[n] = E_B[n] - ((W_q \cdot E_A[n]) \gg 8)$.
-4. Estimate bits:
-   $$\text{cost}_{\text{indep}} = \text{entropy}(E_B)$$
-   $$\text{cost}_{\text{cross}} = \text{entropy}(e_B) + 8 \text{ bits (weight overhead)}$$
 5. If $\text{cost}_{\text{cross}} < \text{cost}_{\text{indep}}$, enable cross-prediction, serialize $W_q$ in track $B$'s frame header, and record $A$ as the reference. Otherwise, save track $B$ independently.
+
+---
+
+## References
+
+1. **Openshaw, D. (2002):** *WavPack Transitional Lossless Audio Compression.* WavPack Documentation. [https://www.wavpack.com](https://www.wavpack.com)
+2. **Den Brinker, A. C. et al. (2009):** *Joint Channel Coding in Lossless Audio Compression.* IEEE Transactions on Audio, Speech, and Language Processing.

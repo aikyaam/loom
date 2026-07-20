@@ -89,3 +89,10 @@ pub enum StereoMode {
 }
 ```
 Each block has a `StereoMode`. The decoder reads the mode and applies the reconstruction formulas.
+
+---
+
+## References
+
+1. **RFC 9639 (2024):** *FLAC Audio Coding Format.* Section 4.2: Interchannel Decorrelation. [https://www.rfc-editor.org/rfc/rfc9639.html#name-interchannel-decorrelation](https://www.rfc-editor.org/rfc/rfc9639.html#name-interchannel-decorrelation)
+2. **Blumlein, A. D. (1933):** *Improvements in and relating to Sound-transmission, Sound-recording and Sound-reproducing Systems.* UK Patent 394,325.

@@ -48,5 +48,11 @@ To decode a time range `decode_range(track, start_sample, end_sample)`:
 Without a seek index, finding a range in a variable-bitrate stream requires reading and parsing every frame from the beginning of the file, which is an $O(N)$ operation (where $N$ is file length).
 With a seek index:
 1. Binary search the seek table: $O(\log S)$ where $S$ is the number of seek points. Since $S \ll N$ and the table fits in RAM, this is effectively instantaneous.
-2. Direct seek + decode the exact range frames: $O(R)$ where $R$ is the range length.
 Thus, extraction time is independent of session length, providing true $O(1)$ seek overhead relative to session length.
+
+---
+
+## References
+
+1. **RFC 9639 (2024):** *FLAC Audio Coding Format.* Section 4.4: Seektable. [https://www.rfc-editor.org/rfc/rfc9639.html#name-seektable](https://www.rfc-editor.org/rfc/rfc9639.html#name-seektable)
+2. **Cormen, T. H. et al. (2009):** *Introduction to Algorithms.* MIT Press. Section 12: Binary Search Trees.

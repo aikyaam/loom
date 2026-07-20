@@ -157,3 +157,10 @@ RESIDUAL := coding_method(2) partition_order(4) RICE_PARTITION+
 3. **Same Rice coding**: the entropy coding is unambiguously specified; we implement it identically.
 
 4. **MD5 checksum** stored in the session header for each track.
+
+---
+
+## References
+
+1. **RFC 9639 (2024):** *FLAC Audio Coding Format.* Internet Engineering Task Force (IETF). [https://www.rfc-editor.org/rfc/rfc9639.html](https://www.rfc-editor.org/rfc/rfc9639.html)
+2. **Xiph.Org Foundation (2000):** *FLAC Format Specification (Legacy).* [https://xiph.org/flac/old_format.html](https://xiph.org/flac/old_format.html)
